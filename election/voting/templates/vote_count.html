@@ -1,0 +1,14 @@
+<h2>Live Vote Count</h2>
+<table border="1">
+  <tr>
+    <th>Party</th>
+    <th>Votes</th>
+  </tr>
+  {% for party, count in counts.items %}
+    <tr>
+      <td>{{ party }}</td>
+      <td>{{ count }}</td>
+    </tr>
+  {% endfor %}
+</table>
+<a href="{% url 'mine_block' %}">Mine Block</a>

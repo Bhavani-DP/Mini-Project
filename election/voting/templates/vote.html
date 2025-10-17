@@ -1,0 +1,11 @@
+<h2>Cast Your Vote</h2>
+<form method="post" action="{% url 'cast_vote' %}">
+  {% csrf_token %}
+  {% for party in parties %}
+    <label>
+      <input type="radio" name="party" value="{{ party.id }}">
+      {{ party.name }} — {{ party.candidate_name }}
+    </label><br>
+  {% endfor %}
+  <button type="submit">Vote Now</button>
+</form>

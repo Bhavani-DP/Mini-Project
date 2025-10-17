@@ -1,0 +1,7 @@
+<h2>Login with Aadhar</h2>
+<form method="post">
+  {% csrf_token %}
+  <label>Aadhar Number:</label>
+  <input type="text" name="aadhar" placeholder="XXXX XXXX XXXX" required>
+  <button type="submit">Authenticate</button>
+</form>

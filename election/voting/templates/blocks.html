@@ -1,0 +1,23 @@
+<h2>Blockchain Explorer</h2>
+<table border="1">
+  <tr>
+    <th>Block ID</th>
+    <th>Previous Hash</th>
+    <th>Transactions</th>
+    <th>Nonce</th>
+    <th>Timestamp</th>
+  </tr>
+  {% for block in chain %}
+    <tr>
+      <td>{{ block.index }}</td>
+      <td>{{ block.previous_hash }}</td>
+      <td>
+        {% for tx in block.transactions %}
+          {{ tx }}<br>
+        {% endfor %}
+      </td>
+      <td>{{ block.nonce }}</td>
+      <td>{{ block.timestamp }}</td>
+    </tr>
+  {% endfor %}
+</table>
