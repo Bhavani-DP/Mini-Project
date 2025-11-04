@@ -1,0 +1,8 @@
+<h2>Email Verification</h2>
+<p>OTP has been sent to: {{ email }}</p>
+<form method="post" action="{% url 'submit_otp' %}">
+  {% csrf_token %}
+  <label>Enter OTP:</label>
+  <input type="text" name="otp" required>
+  <button type="submit">Verify</button>
+</form>
