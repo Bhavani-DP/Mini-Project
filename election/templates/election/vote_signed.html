@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vote Signed</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; }
+        .success { background-color: #4CAF50; color: white; padding: 10px; margin-bottom: 20px; }
+        .box { background: white; padding: 30px; border-radius: 10px; width: 600px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .label { color: red; float: right; font-weight: bold; }
+        .hash { font-family: monospace; word-break: break-all; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="success">✅ Your vote is signed successfully.</div>
+    <div class="label">{{ voter.uid }} ({{ voter.name }})</div>
+    <div class="box">
+        <h3>Your Ballot Hash:</h3>
+        <div class="hash">{{ ballot_hash }}</div>
+        <h3>Government Signature:</h3>
+        <div class="hash">{{ gov_signature }}</div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verify OTP</title>
+</head>
+<body>
+   <h1>✅ OTP Page Loaded</h1>
+   <p>This confirms the redirect and template are working.</p>
+
+<form method="POST">
+    {% csrf_token %}
+    <label for="otp">Enter OTP:</label>
+    <input type="text" name="otp" required>
+    <button type="submit">Submit</button>
+</form>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<!-- election/templates/election/voter_details.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Voter Details</title>
+</head>
+<body>
+    <h2>Welcome, {{ voter.name }}</h2>
+    <p><strong>Aadhaar:</strong> {{ voter.uid }}</p>
+    <p><strong>DOB:</strong> {{ voter.dob }}</p>
+    <p><strong>Email:</strong> {{ voter.email }}</p>
+    <a href="/verify_email/">Proceed to Email Verification</a>
+</body>
+</html>
