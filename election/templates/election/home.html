@@ -1,20 +1,71 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Online Voting Home</title>
+  <meta charset="UTF-8">
+  <title>Online Voting System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      text-align: center;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      font-size: 1.5em;
+      width: 280px;
+      text-align: center;
+      letter-spacing: 2px;
+      font-family: monospace;
+    }
+
+    button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  font-size: 1em;
+  cursor: pointer;
+  background-color: #28a745; /* ✅ Green */
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+  </style>
 </head>
 <body>
-    <h2>Welcome to the Online Voting System</h2>
-    <form method="POST" action="{% url 'verify_email' %}">
-        {% csrf_token %}
 
-        {% if error %}
-      <p style="color:red;">{{ error }}</p>
-    {% endif %}
+  <h1>Welcome to the Online Voting System</h1>
 
-        <label for="aadhaar">Enter Aadhaar Number:</label>
-        <input type="text" name="aadhaar" required>
-        <button type="submit">Verify</button>
-    </form>
+  <div class="form-group">
+    <label for="aadhaar">Enter Aadhaar Number:</label><br><br>
+    <input type="text" id="aadhaar" maxlength="19" placeholder="XXXX XXXX XXXX" oninput="maskAadhaar(this)">
+    <br>
+    <button type="submit">Verify</button>
+  </div>
+
+  <script>
+    function maskAadhaar(input) {
+      let digits = input.value.replace(/\D/g, '').slice(0, 12);
+      let masked = 'XXXXXXXXXXXX'.split('');
+      for (let i = 0; i < digits.length; i++) {
+        masked[i] = digits[i];
+      }
+      let formatted = masked.join('').replace(/(.{4})(.{4})(.{4})/, '$1 $2 $3');
+      input.value = formatted;
+    }
+  </script>
+
 </body>
 </html>
