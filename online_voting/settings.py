@@ -85,3 +85,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'kruthi84069110@gmail.com'  # ← Your Gmail address
 EMAIL_HOST_PASSWORD = 'xixwprtvdbqhzvzb'       # ← Paste your App Password here (no spaces)
+
+TWILIO_ACCOUNT_SID = 'AC342f340cb5de3e1009e4179cdcc07b4b'
+TWILIO_AUTH_TOKEN = '74368b32eb3c1141b86045ca14582d9b'
+TWILIO_PHONE_NUMBER = '+91XXXXXXXXXX'
