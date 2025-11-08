@@ -43,3 +43,11 @@ class Vote(models.Model):
 
     def __str__(self):
         return f"Vote by {self.voter.name} for {self.party.party_name}"
+    
+class Candidate(models.Model):
+    name = models.CharField(max_length=100)
+    party = models.CharField(max_length=100)
+    # Add other fields as needed
+
+    def __str__(self):
+        return self.name

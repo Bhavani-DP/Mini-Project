@@ -14,10 +14,11 @@ import datetime
 def home(request):
     return render(request, 'election/home.html')
 
-from django.shortcuts import render, redirect
-import random
-
-from django.core.mail import send_mail
+def verify_aadhaar(request):
+    if request.method == "POST":
+        aadhaar = request.POST.get("aadhaar", "")
+        return render(request, "otp_page.html", {"aadhaar": aadhaar})
+    return render(request, "aadhaar_form.html")
 
 def verify_email(request):
     if request.method == 'POST':
@@ -27,7 +28,7 @@ def verify_email(request):
         try:
             voter = Voter.objects.get(uid=aadhaar)
         except Voter.DoesNotExist:
-            return render(request, 'election/home.html', {'error': 'Invalid Aadhaar'})
+            return render(request, 'voting/aadhaar_form.html', {'error': 'Invalid Aadhaar'})
 
         otp = str(random.randint(100000, 999999))
         request.session['otp'] = otp
@@ -159,9 +160,6 @@ def otp_form(request):
 def generate_otp():
     return str(random.randint(100000, 999999))
 
-from django.http import HttpResponse
-from twilio.rest import Client
-import random
 
 def send_otp(request):
     if request.method == 'POST':

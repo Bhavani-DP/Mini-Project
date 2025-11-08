@@ -20,6 +20,22 @@ def custom_login(request):
             return render(request, 'accounts/login.html', {'error': 'Invalid credentials'})
     return render(request, 'accounts/login.html')
 
+def verify_aadhaar(request):
+    if request.method == "POST":
+        aadhaar = request.POST.get("aadhaar", "").strip()
+        aadhaar_digits = ''.join(filter(str.isdigit, aadhaar))
+
+        if len(aadhaar_digits) == 12:
+            formatted = f"{aadhaar_digits[:4]} {aadhaar_digits[4:8]} {aadhaar_digits[8:]}"
+            # You can now use `formatted` to display or store the Aadhaar number
+            return render(request, "success.html", {"aadhaar": formatted})
+        else:
+            error = "Invalid Aadhaar number. Please enter exactly 12 digits."
+            return render(request, "aadhaar_form.html", {"error": error})
+
+    return render(request, "aadhaar_form.html")
+
+
 # 🔹 Aadhaar authentication view
 def aadhaar_auth(request):
     if request.method == 'POST':

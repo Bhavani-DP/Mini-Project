@@ -9,6 +9,8 @@ class Voter(models.Model):
     email = models.EmailField()
     profile_pic = models.ImageField(upload_to='profiles/')
     vote_done = models.BooleanField(default=False)
+    def __str__(self):
+        return self.name
 
 class PoliticalParty(models.Model):
     party_id = models.CharField(max_length=10, unique=True)
@@ -18,8 +20,9 @@ class PoliticalParty(models.Model):
     candidate_pic = models.ImageField(upload_to='candidates/')
 
 class Vote(models.Model):
-    voter = models.ForeignKey(Voter, on_delete=models.CASCADE)
+    voter = models.ForeignKey('voting.Voter', on_delete=models.CASCADE)
     party = models.ForeignKey(PoliticalParty, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
     ballot_hash = models.CharField(max_length=256)
     signature = models.TextField()
+

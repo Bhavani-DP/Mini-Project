@@ -15,4 +15,6 @@ urlpatterns = [
     path('otp-form/', views.otp_form, name='otp_form'),
     path('send_otp/', views.send_otp, name='send_otp'),
     path('aadhaar/', views.verify_aadhaar, name='verify_aadhaar'), 
+    path('verify/', views.verify_aadhaar, name='verify_aadhaar'),
+
 ]
