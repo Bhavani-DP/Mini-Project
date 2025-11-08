@@ -12,4 +12,7 @@ urlpatterns = [
     path('submit_vote/', views.submit_vote, name='submit_vote'),
     path('confirm_vote/', views.confirm_vote, name='confirm_vote'),
     path('finalize_vote/', views.finalize_vote, name='finalize_vote'),
+     path('aadhaar/', views.verify_aadhaar, name='verify_aadhaar'),
+    path('send_otp/', views.send_otp, name='send_otp'),
 ]
+

@@ -140,3 +140,5 @@ def finalize_vote(request):
             'ballot_hash': ballot_hash,
             'gov_signature': gov_signature
         })
+
+    

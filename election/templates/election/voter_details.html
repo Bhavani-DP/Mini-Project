@@ -1,4 +1,3 @@
-<!-- election/templates/election/voter_details.html -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,9 +5,15 @@
 </head>
 <body>
     <h2>Welcome, {{ voter.name }}</h2>
-    <p><strong>Aadhaar:</strong> {{ voter.uid }}</p>
-    <p><strong>DOB:</strong> {{ voter.dob }}</p>
-    <p><strong>Email:</strong> {{ voter.email }}</p>
-    <a href="/verify_email/">Proceed to Email Verification</a>
+<p><strong>Aadhaar:</strong> {{ voter.uid }}</p>
+<p><strong>DOB:</strong> {{ voter.dob }}</p>
+<p><strong>Phone:</strong> {{ voter.phone }}</p>
+<img src="{{ voter.photo_url }}" alt="Voter Photo" width="150">
+
+<form method="POST" action="{% url 'send_otp' %}">
+  {% csrf_token %}
+  <input type="hidden" name="phone" value="{{ voter.phone }}">
+  <button type="submit">Send OTP via SMS</button>
+</form>
 </body>
 </html>

@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     'accounts',
     'voting_app',
     'user_auth',
+    'voting',
 ]
 
 # 🔹 Middleware
@@ -40,7 +41,7 @@ WSGI_APPLICATION = 'online_voting.wsgi.application'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],  # You can add BASE_DIR / 'templates' if needed
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -86,6 +87,6 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'kruthi84069110@gmail.com'  # ← Your Gmail address
 EMAIL_HOST_PASSWORD = 'xixwprtvdbqhzvzb'       # ← Paste your App Password here (no spaces)
 
-TWILIO_ACCOUNT_SID = 'AC342f340cb5de3e1009e4179cdcc07b4b'
-TWILIO_AUTH_TOKEN = '74368b32eb3c1141b86045ca14582d9b'
-TWILIO_PHONE_NUMBER = '+91XXXXXXXXXX'
+TWILIO_ACCOUNT_SID = 'AC7bae80ba2d7ec137e84e71123be96eef'
+TWILIO_AUTH_TOKEN = 'a18a47253718e82de72c6ddb4ab5fcbf'
+TWILIO_PHONE_NUMBER = '+12173876498'
