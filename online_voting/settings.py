@@ -86,8 +86,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'kruthi84069110@gmail.com'  # ← Your Gmail address
-EMAIL_HOST_PASSWORD = 'xixwprtvdbqhzvzb'       # ← Paste your App Password here (no spaces)
+EMAIL_HOST_USER = 'kruthi84069110@gmail.com'  
+EMAIL_HOST_PASSWORD = 'xixwprtvdbqhzvzb'       
 
 TWILIO_ACCOUNT_SID = 'AC7bae80ba2d7ec137e84e71123be96eef'
 TWILIO_AUTH_TOKEN = 'a18a47253718e82de72c6ddb4ab5fcbf'

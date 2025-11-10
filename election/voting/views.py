@@ -46,3 +46,4 @@ def send_otp(request):
             return HttpResponse("OTP sent successfully.")
         except Exception as e:
             return HttpResponse(f"Twilio error: {str(e)}")
+    

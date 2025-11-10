@@ -12,13 +12,32 @@ from .twilio_utils import send_otp_sms
 import datetime
 
 def home(request):
-    return render(request, 'election/home.html')
+    return render(request, "election/aadhaar_form.html")
+
+from django.shortcuts import render
 
 def verify_aadhaar(request):
     if request.method == "POST":
-        aadhaar = request.POST.get("aadhaar", "")
-        return render(request, "otp_page.html", {"aadhaar": aadhaar})
-    return render(request, "aadhaar_form.html")
+        aadhaar = request.POST.get("aadhaar", "").replace(" ", "")
+        
+        if not aadhaar.isdigit() or len(aadhaar) != 12:
+            return render(request, "election/aadhaar_form.html", {
+                "error": "Invalid Aadhaar number. Please enter a 12-digit number."
+            })
+
+        # Dummy voter data (replace with DB lookup later)
+        voter_data = {
+            "aadhaar": aadhaar,
+            "name": "Madhan",
+            "dob": "May 2, 1929",
+            "epic": "600044",
+            "state": "Tamil Nadu",
+            "email": "xpertieee@gmail.com"  
+        }
+
+        return render(request, "election/voter_details.html", voter_data)
+    
+    return render(request, "election/aadhaar_form.html")
 
 def verify_email(request):
     if request.method == 'POST':
@@ -182,7 +201,23 @@ def send_otp(request):
             return HttpResponse("OTP sent successfully.")
         except Exception as e:
             return HttpResponse(f"Twilio error: {str(e)}")
-        
+    email = request.POST.get('email')
+    otp = str(random.randint(100000, 999999))
+
+    # Store OTP in session
+    request.session['otp'] = otp
+    request.session['email'] = email
+
+    send_mail(
+        subject='Your Voting OTP',
+        message=f'Your OTP is: {otp}',
+        from_email='yourgmail@gmail.com',
+        recipient_list=[email],
+        fail_silently=False,
+    )
+
+    return render(request, 'election/enter_otp.html', {'email': email})
+    
 def submit_otp(request):
     return HttpResponse("OTP submitted successfully.")
 
@@ -191,5 +226,8 @@ def mine_block(request):
 
 def blockchain_view(request):
     return HttpResponse("Blockchain view placeholder")
+
+def verify_sms_otp(request):
+    return HttpResponse("SMS OTP verified.")
 
 

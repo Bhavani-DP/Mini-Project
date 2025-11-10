@@ -1,19 +1,127 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Voter Details</title>
+  <title>Voter Details</title>
+  <style>
+    body {
+      background-image: url('/static/images/india_flag.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      width: 420px;
+      text-align: left;
+      margin-top: 40px;
+    }
+
+    .card h2 {
+      text-align: center;
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .field {
+      margin-bottom: 10px;
+    }
+
+    .label {
+      font-weight: bold;
+    }
+
+    .email-section {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .email-section p {
+      margin: 5px 0;
+    }
+
+    .warning {
+      color: red;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .info {
+      color: #ff69b4;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      font-size: 14px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      margin: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .vote-button {
+      background-color: #28a745;
+      margin-top: 20px;
+    }
+
+    .vote-button:hover {
+      background-color: #218838;
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        width: 90%;
+        padding: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <h2>Welcome, {{ voter.name }}</h2>
-<p><strong>Aadhaar:</strong> {{ voter.uid }}</p>
-<p><strong>DOB:</strong> {{ voter.dob }}</p>
-<p><strong>Phone:</strong> {{ voter.phone }}</p>
-<img src="{{ voter.photo_url }}" alt="Voter Photo" width="150">
+  <div class="card">
+    <h2>Welcome to the Online Voting System</h2>
+    <div class="field"><span class="label">Aadhar No:</span> {{ aadhaar }}</div>
+    <div class="field"><span class="label">Name:</span> {{ name }}</div>
+    <div class="field"><span class="label">DOB:</span> {{ dob }}</div>
+    <div class="field"><span class="label">EPIC No:</span> {{ epic }}</div>
+    <div class="field"><span class="label">State:</span> {{ state }}</div>
 
-<form method="POST" action="{% url 'send_otp' %}">
-  {% csrf_token %}
-  <input type="hidden" name="phone" value="{{ voter.phone }}">
-  <button type="submit">Send OTP via SMS</button>
-</form>
+    <div class="email-section">
+      <p class="info">Key will be sent to this email-id, please verify it.</p>
+      <p class="warning">Please verify your Email-ID. Key will be sent to this Email-ID.</p>
+      <p><strong>{{ email }}</strong></p>
+      <button>Change</button>
+
+      <form method="POST" action="{% url 'send_otp' %}">
+        {% csrf_token %}
+        <input type="hidden" name="email" value="{{ email }}">
+        <button type="submit">Send OTP</button>
+      </form>
+    </div>
+    <div style="text-align: center;">
+      <button class="vote-button">Vote Now</button>
+    </div>
+  </div>
 </body>
 </html>
