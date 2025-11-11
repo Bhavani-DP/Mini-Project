@@ -25,14 +25,14 @@ def verify_aadhaar(request):
             })
 
         try:
-            voter = Voter.objects.get(adhaar_number=aadhaar)
+            voter = Voter.objects.get(aadhar_number=aadhaar)  
         except Voter.DoesNotExist:
             return render(request, "election/aadhaar_form.html", {
                 "error": "No voter found with this Aadhaar number."
             })
 
         voter_data = {
-            "aadhaar": voter.adhaar_number,  
+            "aadhaar": voter.aadhar_number, 
             "name": voter.name,
             "dob": voter.dob,
             "epic": voter.epic,
