@@ -101,11 +101,12 @@
 <body>
   <div class="card">
     <h2>Welcome to the Online Voting System</h2>
-    <div class="field"><span class="label">Aadhar No:</span> {{ aadhaar }}</div>
-    <div class="field"><span class="label">Name:</span> {{ name }}</div>
-    <div class="field"><span class="label">DOB:</span> {{ dob }}</div>
-    <div class="field"><span class="label">EPIC No:</span> {{ epic }}</div>
-    <div class="field"><span class="label">State:</span> {{ state }}</div>
+    <div class="field"><span class="label">Aadhar No:</span> {{ voter.adhaar_number }}</div>
+<div class="field"><span class="label">Name:</span> {{ voter.name }}</div>
+<div class="field"><span class="label">DOB:</span> {{ voter.dob }}</div>
+<div class="field"><span class="label">EPIC No:</span> {{ voter.epic }}</div>
+<div class="field"><span class="label">State:</span> {{ voter.state }}</div>
+<p><strong>{{ voter.email }}</strong></p>
 
     <div class="email-section">
       <p class="info">Key will be sent to this email-id, please verify it.</p>

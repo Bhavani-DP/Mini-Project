@@ -10,33 +10,38 @@ from django.http import HttpResponse
 from twilio.rest import Client
 from .twilio_utils import send_otp_sms
 import datetime
+from .models import Voter
 
 def home(request):
     return render(request, "election/aadhaar_form.html")
 
-from django.shortcuts import render
-
 def verify_aadhaar(request):
     if request.method == "POST":
         aadhaar = request.POST.get("aadhaar", "").replace(" ", "")
-        
+
         if not aadhaar.isdigit() or len(aadhaar) != 12:
             return render(request, "election/aadhaar_form.html", {
                 "error": "Invalid Aadhaar number. Please enter a 12-digit number."
             })
 
-        # Dummy voter data (replace with DB lookup later)
+        try:
+            voter = Voter.objects.get(adhaar_number=aadhaar)
+        except Voter.DoesNotExist:
+            return render(request, "election/aadhaar_form.html", {
+                "error": "No voter found with this Aadhaar number."
+            })
+
         voter_data = {
-            "aadhaar": aadhaar,
-            "name": "Madhan",
-            "dob": "May 2, 1929",
-            "epic": "600044",
-            "state": "Tamil Nadu",
-            "email": "xpertieee@gmail.com"  
+            "aadhaar": voter.adhaar_number,  
+            "name": voter.name,
+            "dob": voter.dob,
+            "epic": voter.epic,
+            "state": voter.state,
+            "email": voter.email
         }
 
         return render(request, "election/voter_details.html", voter_data)
-    
+
     return render(request, "election/aadhaar_form.html")
 
 def verify_email(request):
@@ -45,13 +50,13 @@ def verify_email(request):
         print("Submitted Aadhaar:", aadhaar)
 
         try:
-            voter = Voter.objects.get(uid=aadhaar)
+            voter = Voter.objects.get(adhaar_number=aadhaar)
         except Voter.DoesNotExist:
             return render(request, 'voting/aadhaar_form.html', {'error': 'Invalid Aadhaar'})
 
         otp = str(random.randint(100000, 999999))
         request.session['otp'] = otp
-        request.session['uid'] = aadhaar
+        request.session['aadhar_number'] = aadhaar
         print("Generated OTP:", otp)
 
         # ✅ Send OTP to voter's email
@@ -80,8 +85,8 @@ def confirm_otp(request):
 
             if entered_otp == stored_otp:
                 request.session['email_verified'] = True
-                aadhaar = request.session.get('uid')
-                voter = Voter.objects.get(uid=aadhaar)
+                aadhaar = request.session.get('aadhar_number')
+                voter = Voter.objects.get(aadhar_number=aadhaar)
                 request.session['voter_id'] = voter.id
                 return redirect('cast_vote')
             else:
@@ -147,7 +152,7 @@ def finalize_vote(request):
         party = PoliticalParty.objects.get(id=party_id)
 
         timestamp = datetime.datetime.now().isoformat()
-        ballot_hash, gov_signature = sign_vote(voter.uid, party.party_id, timestamp, secret=private_key)
+        ballot_hash, gov_signature = sign_vote(voter.aadhar_number, party.party_id, timestamp, secret=private_key)
 
         Vote.objects.create(
             voter=voter,

@@ -41,7 +41,7 @@ def aadhaar_auth(request):
     if request.method == 'POST':
         uid = request.POST.get('aadhaar')
         try:
-            voter = Voter.objects.get(uid=uid)
+            voter = Voter.objects.get(adhaar_number=uid)
             request.session['voter_id'] = voter.id
             return redirect('voter_details')
         except Voter.DoesNotExist:
