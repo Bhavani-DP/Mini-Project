@@ -1,6 +1,7 @@
 import random
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail
+from django.conf import settings
 from .models import Voter, PoliticalParty, Vote
 from election.forms import OTPForm, UIDForm
 from blockchain.utils import sign_vote
@@ -32,15 +33,14 @@ def verify_aadhaar(request):
             })
 
         voter_data = {
-            "aadhaar": voter.aadhar_number, 
-            "name": voter.name,
-            "dob": voter.dob,
-            "epic": voter.epic,
-            "state": voter.state,
-            "email": voter.email
+        "aadhaar": voter.aadhar_number,
+        "name": voter.name,
+        "dob": voter.dob,
+        "state": voter.region,  
+        "email": voter.email
         }
 
-        return render(request, "election/voter_details.html", voter_data)
+        return render(request, 'election/voter_details.html', {'voter': voter})
 
     return render(request, "election/aadhaar_form.html")
 
@@ -184,44 +184,31 @@ def otp_form(request):
 def generate_otp():
     return str(random.randint(100000, 999999))
 
-
 def send_otp(request):
     if request.method == 'POST':
-        phone_number = request.POST.get('phone')  # e.g. 968698XXXX
-        to_number = '+91' + phone_number.strip()  # ✅ Add country code
+        email = request.POST.get('email')
+        phone_number = request.POST.get('phone_number')
+        otp = str(random.randint(100000, 999999))
 
-        account_sid = 'AC7bae80ba2d7ec137e84e71123be96eef'
-        auth_token = 'a18a47253718e82de72c6ddb4ab5fcbf'
-        client = Client(account_sid, auth_token)
+        if email:
+            send_mail(
+                'Your OTP',
+                f'Your OTP is: {otp}',
+                settings.EMAIL_HOST_USER,
+                [email],
+                fail_silently=False,
+            )
 
-        otp = str(random.randint(100000, 999999))  # ✅ Generate OTP
-        body = f"Your OTP is {otp}"
-
-        try:
-            message = client.messages.create(
-                body=body,
-                from_='+12173876498',  # ✅ Your Twilio number
+        if phone_number:
+            to_number = '+91' + phone_number.strip()
+            client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+            client.messages.create(
+                body=f'Your OTP is: {otp}',
+                from_=settings.TWILIO_PHONE_NUMBER,
                 to=to_number
             )
-            return HttpResponse("OTP sent successfully.")
-        except Exception as e:
-            return HttpResponse(f"Twilio error: {str(e)}")
-    email = request.POST.get('email')
-    otp = str(random.randint(100000, 999999))
 
-    # Store OTP in session
-    request.session['otp'] = otp
-    request.session['email'] = email
-
-    send_mail(
-        subject='Your Voting OTP',
-        message=f'Your OTP is: {otp}',
-        from_email='yourgmail@gmail.com',
-        recipient_list=[email],
-        fail_silently=False,
-    )
-
-    return render(request, 'election/enter_otp.html', {'email': email})
+        return render(request, 'election/otp_sending.html')  
     
 def submit_otp(request):
     return HttpResponse("OTP submitted successfully.")
@@ -234,5 +221,11 @@ def blockchain_view(request):
 
 def verify_sms_otp(request):
     return HttpResponse("SMS OTP verified.")
+
+def change_email(request):
+    return render(request, 'election/change_email.html')  
+
+def verify_email_otp(request):
+    return render(request, 'election/verify_email_otp.html')
 
 

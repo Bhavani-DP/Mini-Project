@@ -14,7 +14,9 @@ urlpatterns = [
     path('blockchain/', views.blockchain_view, name='blockchain'),
     path('otp-form/', views.otp_form, name='otp_form'),
     path('send_otp/', views.send_otp, name='send_otp'),
+    path('change_email/', views.change_email, name='change_email'),
     path('aadhaar/', views.verify_aadhaar, name='verify_aadhaar'), 
     path('verify/', views.verify_aadhaar, name='verify_aadhaar'),
-    path('verify_sms_otp/', views.verify_sms_otp, name='verify_sms_otp')
+    path('verify_sms_otp/', views.verify_sms_otp, name='verify_sms_otp'),
+    path('verify_email_otp/', views.verify_email_otp, name='verify_email_otp'),
 ]

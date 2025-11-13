@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sending OTP</title>
+  <meta http-equiv="refresh" content="5;url={% url 'verify_email_otp' %}">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      text-align: center;
+      padding-top: 40px;
+    }
+    .banner {
+      background-color: #d8c4f0;
+      color: #4b0082;
+      padding: 12px;
+      font-weight: bold;
+      border-radius: 6px;
+      margin-bottom: 30px;
+      font-size: 16px;
+      width: 80%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .logo {
+      margin-bottom: 20px;
+    }
+    .logo img {
+      width: 160px;
+      margin-bottom: 20px;
+    }
+
+    .title {
+      font-size: 22px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    .status {
+      font-size: 18px;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+  <div class="banner">Please verify an Email-ID, Private key will be sent to this Email-ID.</div>
+
+  <div class="logo">
+    <img src="{% static 'images\election_logo.png' %}" alt="Election Logo">
+  </div>
+
+  <div class="title">INDIAN ELECTION using Blockchain</div>
+  <div class="status">Please wait, OTP is being sent to your email-id.</div>
+</body>
+</html>

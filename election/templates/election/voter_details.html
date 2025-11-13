@@ -1,128 +1,179 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Voter Details</title>
+  <meta charset="UTF-8">
+  <title>Voter details</title>
   <style>
     body {
-      background-image: url('/static/images/india_flag.png');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
-      font-family: 'Segoe UI', sans-serif;
-      font-size: 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
       margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
 
-    .card {
-      background: white;
-      padding: 30px;
+    .container {
+      background-color: white;
+      padding: 30px 40px;
       border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
-      width: 420px;
-      text-align: left;
-      margin-top: 40px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      width: 600px;
     }
 
-    .card h2 {
+    h2 {
       text-align: center;
-      font-size: 24px;
-      font-weight: 600;
+      margin-bottom: 25px;
+      color: #333;
+    }
+
+    .info-box {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
       margin-bottom: 20px;
     }
 
-    .field {
-      margin-bottom: 10px;
+    table {
+      border-collapse: collapse;
+      width: 100%;
     }
 
-    .label {
+    td {
+      padding: 8px 5px;
+      font-size: 16px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    td.label {
       font-weight: bold;
+      width: 40%;
+      color: #555;
     }
 
-    .email-section {
+    /* Remove bottom border from last row */
+    table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .profile-pic {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #ccc;
       margin-top: 20px;
-      text-align: center;
     }
 
-    .email-section p {
-      margin: 5px 0;
+    .email-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
     }
 
-    .warning {
-      color: red;
+    .email-label {
       font-weight: bold;
-      margin-bottom: 10px;
+      color: #555;
+      margin-right: 10px;
     }
 
-    .info {
-      color: #ff69b4;
-      font-weight: bold;
-      margin-bottom: 5px;
+    .email-value {
+      flex-grow: 1;
+      font-size: 16px;
+      margin-right: 10px;
+      color: #333;
+    }
+
+    .email-actions {
+      display: flex;
+      gap: 8px;
     }
 
     button {
-      background-color: #007bff;
-      color: white;
+      padding: 6px 12px;
       font-size: 14px;
-      padding: 8px 16px;
       border: none;
-      border-radius: 4px;
-      margin: 5px;
+      border-radius: 5px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
     }
 
-    button:hover {
-      background-color: #0056b3;
+    .change-btn {
+      background-color: #ff9800;
+      color: white;
     }
 
-    .vote-button {
-      background-color: #28a745;
+    .otp-btn {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .note {
+      text-align: center;
+      font-size: 14px;
+      color: #777;
       margin-top: 20px;
-    }
-
-    .vote-button:hover {
-      background-color: #218838;
-    }
-
-    @media (max-width: 480px) {
-      .card {
-        width: 90%;
-        padding: 20px;
-      }
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h2>Welcome to the Online Voting System</h2>
-    <div class="field"><span class="label">Aadhar No:</span> {{ voter.adhaar_number }}</div>
-<div class="field"><span class="label">Name:</span> {{ voter.name }}</div>
-<div class="field"><span class="label">DOB:</span> {{ voter.dob }}</div>
-<div class="field"><span class="label">EPIC No:</span> {{ voter.epic }}</div>
-<div class="field"><span class="label">State:</span> {{ voter.state }}</div>
-<p><strong>{{ voter.email }}</strong></p>
+  <div class="container">
+    <h2>Authentication Successful</h2>
 
-    <div class="email-section">
-      <p class="info">Key will be sent to this email-id, please verify it.</p>
-      <p class="warning">Please verify your Email-ID. Key will be sent to this Email-ID.</p>
-      <p><strong>{{ email }}</strong></p>
-      <button>Change</button>
+    <div class="info-box">
+      <table>
+        <tr>
+          <td class="label">Aadhaar No.:</td>
+          <td>{{ voter.aadhar_number }}</td>
+        </tr>
+        <tr>
+          <td class="label">Name:</td>
+          <td>{{ voter.name }}</td>
+        </tr>
+        <tr>
+          <td class="label">DOB:</td>
+          <td>{{ voter.dob }}</td>
+        </tr>
+        <tr>
+          <td class="label">Pincode No.:</td>
+          <td>{{ voter.pincode }}</td>
+        </tr>
+        <tr>
+          <td class="label">Region:</td>
+          <td>{{ voter.region }}</td>
+        </tr>
+      </table>
+      {% if voter.profile_pic %}
+        <img src="{{ voter.profile_pic.url }}" alt="Profile Picture" class="profile-pic">
+      {% else %}
+         <img src="{% static 'images/default_avatar.png' %}" alt="Default Avatar" class="profile-pic">
+      {% endif %}
+    </div>
 
-      <form method="POST" action="{% url 'send_otp' %}">
-        {% csrf_token %}
-        <input type="hidden" name="email" value="{{ email }}">
-        <button type="submit">Send OTP</button>
-      </form>
+    <div class="email-row">
+      <span class="email-label">Associated Email-ID:</span>
+      <span class="email-value">{{ voter.email }}</span>
+      <div class="email-actions">
+        <form method="GET" action="{% url 'change_email' %}">
+          <button class="change-btn" type="submit">Change</button>
+        </form>
+
+        <form method="POST" action="{% url 'send_otp' %}">
+          {% csrf_token %}
+          <input type="hidden" name="email" value="{{ voter.email }}">
+          <input type="hidden" name="phone_number" value="{{ voter.phone_number }}">
+          <button class="otp-btn" type="submit">Send OTP</button>
+        </form>
+      </div>
     </div>
-    <div style="text-align: center;">
-      <button class="vote-button">Vote Now</button>
-    </div>
+
+    <div class="note">Please verify your Email-ID. Key will be sent to this Email-ID.</div>
   </div>
 </body>
 </html>
