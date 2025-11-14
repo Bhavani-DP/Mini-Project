@@ -2,6 +2,7 @@ import random
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail
 from django.conf import settings
+from django.contrib import messages
 from .models import Voter, PoliticalParty, Vote
 from election.forms import OTPForm, UIDForm
 from blockchain.utils import sign_vote
@@ -12,6 +13,7 @@ from twilio.rest import Client
 from .twilio_utils import send_otp_sms
 import datetime
 from .models import Voter
+from election.forms import OTPForm 
 
 def home(request):
     return render(request, "election/aadhaar_form.html")
@@ -26,40 +28,34 @@ def verify_aadhaar(request):
             })
 
         try:
-            voter = Voter.objects.get(aadhar_number=aadhaar)  
+            voter = Voter.objects.get(aadhar_number=aadhaar)
         except Voter.DoesNotExist:
             return render(request, "election/aadhaar_form.html", {
                 "error": "No voter found with this Aadhaar number."
             })
 
-        voter_data = {
-        "aadhaar": voter.aadhar_number,
-        "name": voter.name,
-        "dob": voter.dob,
-        "state": voter.region,  
-        "email": voter.email
-        }
-
-        return render(request, 'election/voter_details.html', {'voter': voter})
+        form = OTPForm()  # ✅ Create an empty OTP form
+        return render(request, 'election/voter_details.html', {
+            'voter': voter,
+            'form': form
+        })
 
     return render(request, "election/aadhaar_form.html")
 
 def verify_email(request):
     if request.method == 'POST':
         aadhaar = request.POST.get('aadhaar', '').strip()
-        print("Submitted Aadhaar:", aadhaar)
 
         try:
-            voter = Voter.objects.get(adhaar_number=aadhaar)
+            voter = Voter.objects.get(aadhar_number=aadhaar)
         except Voter.DoesNotExist:
             return render(request, 'voting/aadhaar_form.html', {'error': 'Invalid Aadhaar'})
 
         otp = str(random.randint(100000, 999999))
-        request.session['otp'] = otp
         request.session['aadhar_number'] = aadhaar
-        print("Generated OTP:", otp)
+        request.session['otp'] = otp
+        print("Session Aadhaar:", request.session.get('aadhar_number'))
 
-        # ✅ Send OTP to voter's email
         send_mail(
             subject='Your OTP for Online Voting',
             message=f'Your OTP is: {otp}',
@@ -67,34 +63,30 @@ def verify_email(request):
             recipient_list=[voter.email],
             fail_silently=False,
         )
-        print("Redirecting to confirm_otp")
-        return redirect('http://127.0.0.1:8000/confirm_otp/')
+
+        messages.success(request, "Enter the OTP sent to your email.")
+    return redirect('otp_sending')
+
     return render(request, 'home.html')
 
 def confirm_otp(request):
-    print("✅ confirm_otp view reached")
+    aadhaar = request.session.get('aadhar_number')
 
-    if request.session.get('email_verified'):
-        return redirect('cast_vote')
+    if not aadhaar:
+        return redirect('home')
 
-    if request.method == 'POST':
-        form = OTPForm(request.POST)
-        if form.is_valid():
-            entered_otp = form.cleaned_data['otp']
-            stored_otp = request.session.get('otp')
+    try:
+        voter = Voter.objects.get(aadhar_number=aadhaar)
+    except Voter.DoesNotExist:
+        return redirect('home')
+    print("Confirm OTP Aadhaar:", request.session.get('aadhar_number'))
 
-            if entered_otp == stored_otp:
-                request.session['email_verified'] = True
-                aadhaar = request.session.get('aadhar_number')
-                voter = Voter.objects.get(aadhar_number=aadhaar)
-                request.session['voter_id'] = voter.id
-                return redirect('cast_vote')
-            else:
-                form.add_error('otp', 'Invalid OTP')
-    else:
-        form = OTPForm()
+    form = OTPForm()
 
-    return render(request, 'election/verify_email_otp.html', {'form': form})
+    return render(request, 'election/verify_email_otp.html', {
+        'form': form,
+        'voter': voter
+    })
 
 def cast_vote(request):
     voter_id = request.session.get('voter_id')
@@ -112,6 +104,7 @@ def cast_vote(request):
     return render(request, 'election/cast_vote.html', {
         'voter': voter,
         'parties': parties,
+        
         'email_verified': email_verified
     })
 
@@ -226,6 +219,25 @@ def change_email(request):
     return render(request, 'election/change_email.html')  
 
 def verify_email_otp(request):
-    return render(request, 'election/verify_email_otp.html')
+    aadhaar = request.session.get('aadhar_number')
+
+    if not aadhaar:
+        return redirect('home')  # fallback if session is missing
+
+    try:
+        voter = Voter.objects.get(aadhar_number=aadhaar)
+    except Voter.DoesNotExist:
+        return redirect('home')  # fallback if voter not found
+
+    form = OTPForm()
+
+    return render(request, 'election/verify_email_otp.html', {
+        'form': form,
+        'voter': voter
+    })
+
+def otp_sending(request):
+    return render(request, 'election/otp_sending.html')
+
 
 
