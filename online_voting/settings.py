@@ -87,7 +87,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'kruthi84069110@gmail.com'
-EMAIL_HOST_PASSWORD = 'gtti nqsd bnvq rtdv' 
+EMAIL_HOST_PASSWORD = 'gtti nqsd bnvq rtdv'
 
 TWILIO_ACCOUNT_SID = 'AC7bae80ba2d7ec137e84e71123be96eef'
 TWILIO_AUTH_TOKEN = 'a18a47253718e82de72c6ddb4ab5fcbf'

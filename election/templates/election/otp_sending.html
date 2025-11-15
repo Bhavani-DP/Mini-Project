@@ -1,30 +1,91 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Sending OTP</title>
-  <meta http-equiv="refresh" content="3;url={% url 'confirm_otp' %}">
+  <meta http-equiv="refresh" content="3;url={% url 'verify_aadhaar' %}">
   <style>
-    body {
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
       font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       text-align: center;
-      padding-top: 100px;
-      background-color: #f9f9f9;
     }
-    .banner {
-      background-color: #e6dcf5;
-      color: #4b0082;
-      padding: 20px;
-      border-radius: 8px;
-      font-size: 18px;
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo img {
+      width: 180px;
+      margin-bottom: 10px;
+    }
+    .title {
+      font-size: 26px;
       font-weight: bold;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      display: inline-block;
+      color: #aaa;
+      margin-top: 10px;
+    }
+    .subtitle {
+      font-size: 18px;
+      color: #aaa;
+      margin-bottom: 30px;
+    }
+    .otp-box {
+      background-color: #fff;
+      border-top: 2px solid #ccc;
+      border-bottom: 2px solid #ccc;
+      padding: 20px;
+      width: 100vw;
+      font-size: 16px;
+      color: #333;
+      text-align: center;
+      font-weight: bold;
+      box-sizing: border-box;
+      margin-top: 20px;
+    }
+    .dots {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .dot {
+      border-radius: 50%;
+      animation: pop 1s infinite ease-in-out;
+    }
+    .dot:nth-child(1) { width: 12px; height: 12px; background-color: red; animation-delay: 0s; }
+    .dot:nth-child(2) { width: 10px; height: 10px; background-color: orange; animation-delay: 0.2s; }
+    .dot:nth-child(3) { width: 8px; height: 8px; background-color: yellowgreen; animation-delay: 0.4s; }
+    .dot:nth-child(4) { width: 6px; height: 6px; background-color: green; animation-delay: 0.6s; }
+    @keyframes pop {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50% { transform: scale(1.5); opacity: 1; }
     }
   </style>
 </head>
 <body>
-  <div class="banner">
-    Please wait, OTP is being sent to your email-id.
+  <div class="container">
+    <div class="logo">
+      <img src="{% static 'images/election_logo.png' %}" alt="Election Logo">
+      <div class="title">INDIAN ELECTION</div>
+      <div class="subtitle">using Blockchain</div>
+    </div>
+    <div class="otp-box">Please wait, OTP is being sent to your email-id.</div>
+    <div class="dots">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
   </div>
 </body>
 </html>

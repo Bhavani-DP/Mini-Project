@@ -1,0 +1,127 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Verify Email OTP</title>
+  <style>
+    body {
+      font-family: Arial;
+      background-color: #f2f2f2;
+      padding: 30px;
+    }
+    .container {
+      background-color: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      width: 600px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .banner {
+      background-color: #d8c4f0;
+      color: #4b0082;
+      padding: 12px;
+      font-weight: bold;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .logo img {
+      width: 160px;
+      display: block;
+      margin: 0 auto 20px;
+    }
+    .field {
+      margin-bottom: 12px;
+    }
+    .field label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .field input {
+      width: 100%;
+      padding: 8px;
+      font-size: 14px;
+    }
+    .buttons {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .buttons button {
+      padding: 10px 20px;
+      margin: 0 10px;
+      background-color: #4b0082;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .buttons button:hover {
+      background-color: #5e2ca5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="banner">Please verify an Email-ID, Private key will be sent to this Email-ID.</div>
+
+    <div class="logo">
+      <img src="{% static 'images/election_logo.png' %}" alt="Election Logo">
+    </div>
+
+    {% if messages %}
+      <div style="margin-bottom: 20px;">
+        {% for message in messages %}
+          <div style="
+            background-color: #e6dcf5;
+            color: #4b0082;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
+          ">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if voter %}
+      <div class="field"><label>Aadhar No.:</label> {{ voter.aadhar_number }}</div>
+      <div class="field"><label>Name:</label> {{ voter.name }}</div>
+      <div class="field"><label>DOB:</label> {{ voter.dob }}</div>
+      <div class="field"><label>Pincode No.:</label> {{ voter.pincode }}</div>
+      <div class="field"><label>Region:</label> {{ voter.region }}</div>
+      <div class="field"><label>Associated Email-ID:</label> {{ voter.email }}</div>
+
+      <div class="buttons">
+        <form method="POST" action="{% url 'verify_email' %}" style="display:inline;">
+          {% csrf_token %}
+          <input type="hidden" name="aadhaar" value="{{ voter.aadhar_number }}">
+          <button type="submit">Resend OTP</button>
+        </form>
+        <button type="button" onclick="window.location.href='{% url 'change_email' %}'">Change Email</button>
+      </div>
+    {% endif %}
+
+    <hr>
+
+    <form method="POST" action="{% url 'confirm_otp' %}">
+      {% csrf_token %}
+      <div class="field">
+        <label>Enter OTP sent to your email:</label>
+        {{ form.otp }}
+        {% if form.errors.otp %}
+          <div style="color:red;">{{ form.errors.otp }}</div>
+        {% endif %}
+      </div>
+      <div class="buttons">
+        <button type="submit">Verify</button>
+        <button type="button" onclick="window.location.href='{% url 'home' %}'">Cancel</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

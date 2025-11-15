@@ -100,15 +100,15 @@
         <form method="POST" action="{% url 'verify_email' %}" style="display:inline;">
           {% csrf_token %}
           <input type="hidden" name="aadhaar" value="{{ voter.aadhar_number }}">
-          <button type="submit">Send OTP</button>
+          <button type="submit">Resend OTP</button>
         </form>
-        <button type="button" onclick="window.location.href='{% url 'change_email' %}'">Change</button>
+        <button type="button" onclick="window.location.href='{% url 'change_email' %}'">Change Email</button>
       </div>
     {% endif %}
 
     <hr>
 
-    <form method="POST">
+    <form method="POST" action="{% url 'confirm_otp' %}">
       {% csrf_token %}
       <div class="field">
         <label>Enter OTP sent to your email:</label>

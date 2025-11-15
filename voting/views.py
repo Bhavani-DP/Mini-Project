@@ -34,12 +34,30 @@ def verify_aadhaar(request):
                 "error": "No voter found with this Aadhaar number."
             })
 
-        form = OTPForm()  # ✅ Create an empty OTP form
+        request.session['aadhar_number'] = aadhaar
+        request.session.modified = True
+
+        form = OTPForm()
         return render(request, 'election/voter_details.html', {
             'voter': voter,
             'form': form
         })
 
+    # ✅ Handle GET request after waiting page
+    aadhaar = request.session.get('aadhar_number')
+    if aadhaar:
+        try:
+            voter = Voter.objects.get(aadhar_number=aadhaar)
+            form = OTPForm()
+            return render(request, 'election/voter_details.html', {
+                'voter': voter,
+                'form': form
+            })
+        except Voter.DoesNotExist:
+            messages.error(request, "Session Aadhaar not found in database.")
+            return redirect('verify_email')
+
+    # ❌ No session — show input form
     return render(request, "election/aadhaar_form.html")
 
 def verify_email(request):
@@ -49,10 +67,10 @@ def verify_email(request):
         try:
             voter = Voter.objects.get(aadhar_number=aadhaar)
         except Voter.DoesNotExist:
-            return render(request, 'voting/aadhaar_form.html', {'error': 'Invalid Aadhaar'})
+            return render(request, 'election/aadhaar_form.html', {'error': 'Invalid Aadhaar'})
 
         otp = str(random.randint(100000, 999999))
-        request.session['aadhar_number'] = aadhaar
+        aadhaar = request.session.get('aadhar_number')
         request.session['otp'] = otp
         print("Session Aadhaar:", request.session.get('aadhar_number'))
 
@@ -65,23 +83,42 @@ def verify_email(request):
         )
 
         messages.success(request, "Enter the OTP sent to your email.")
-    return redirect('otp_sending')
 
-    return render(request, 'home.html')
+        # ✅ Ensure session is saved before redirect
+        request.session.modified = True
+        return redirect('otp_sending')
+
+    return redirect('home') 
+
+def otp_sending(request):
+    return render(request, 'election/otp_sending.html')
 
 def confirm_otp(request):
     aadhaar = request.session.get('aadhar_number')
-
     if not aadhaar:
-        return redirect('home')
+        messages.error(request, "Session expired. Please re-enter your Aadhaar number.")
+        return redirect('verify_aadhaar')
 
     try:
         voter = Voter.objects.get(aadhar_number=aadhaar)
     except Voter.DoesNotExist:
         return redirect('home')
-    print("Confirm OTP Aadhaar:", request.session.get('aadhar_number'))
 
-    form = OTPForm()
+    form = OTPForm(request.POST or None)
+
+    if request.method == 'POST':
+        if form.is_valid():
+            entered_otp = form.cleaned_data['otp']
+            session_otp = request.session.get('otp')
+
+            if entered_otp == session_otp:
+                messages.success(request, "OTP verified successfully.")
+                return render(request, 'election/verify_email_otp.html', {
+                    'form': OTPForm(),  # fresh form
+                    'voter': voter
+                })
+            else:
+                messages.error(request, "Invalid OTP. Please try again.")
 
     return render(request, 'election/verify_email_otp.html', {
         'form': form,
@@ -222,12 +259,12 @@ def verify_email_otp(request):
     aadhaar = request.session.get('aadhar_number')
 
     if not aadhaar:
-        return redirect('home')  # fallback if session is missing
+        return redirect('home') 
 
     try:
         voter = Voter.objects.get(aadhar_number=aadhaar)
     except Voter.DoesNotExist:
-        return redirect('home')  # fallback if voter not found
+        return redirect('home')  
 
     form = OTPForm()
 
@@ -236,8 +273,11 @@ def verify_email_otp(request):
         'voter': voter
     })
 
-def otp_sending(request):
-    return render(request, 'election/otp_sending.html')
+def aadhaar_form(request):
+    return render(request, 'election/aadhaar_form.html')
+
+
+
 
 
 
