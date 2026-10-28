@@ -1,0 +1,199 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Indian Election using Blockchain</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: url("{% static 'images/parliament_flag_bg.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+        }
+
+        .top-logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .top-logo img {
+            height: 60px;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 220px;
+            background-color: rgba(0, 0, 0, 0.85);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sidebar h2 {
+            font-size: 1.5em;
+            color: #ffcc00;
+            margin-bottom: 20px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.1em;
+        }
+
+        .sidebar ul li a:hover {
+            color: #ff9933;
+        }
+
+        .back-button {
+            background-color: #ff9933;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .back-button:hover {
+            background-color: #cc7a29;
+        }
+
+        .main {
+            flex: 1;
+            padding: 60px 40px;
+            background-color: rgba(0, 0, 0, 0.6);
+            text-align: center;
+        }
+
+        .main h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .main p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            font-size: 1.2em;
+            width: 300px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button[type="submit"] {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            background-color: #ff9933;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #cc7a29;
+        }
+
+        #page2 {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+
+    <!-- Page 1: Aadhar Authentication -->
+    <div id="page1" class="container">
+        <div class="main" style="margin: auto;">
+            <h1>Indian Election using Blockchain</h1>
+            <p>Please enter your Aadhaar Card Number to authenticate yourself in order to cast your priceless vote.</p>
+            <form method="POST" action="{% url 'authenticate_voter' %}">
+                {% csrf_token %}
+                <input type="text" name="aadhaar_number" placeholder="XXXX XXXX XXXX" required>
+                <br>
+                <button type="submit">Authenticate</button>
+            </form>
+        </div>
+    </div>
+    <!-- Top Logo with Side-by-Side Text -->
+<div class="top-logo" onclick="showDashboard()">
+  <div class="logo-horizontal">
+    <img src="{% static 'images/election_logo.png' %}" alt="Election Logo">
+    <div class="logo-text">
+      <div class="logo-title">Indian Election</div>
+      <div class="logo-subtitle">using Blockchain</div>
+    </div>
+  </div>
+</div>
+
+    <!-- Page 2: Dashboard -->
+<div id="page2" class="container">
+    <div class="sidebar">
+    <div class="sidebar-dots">
+        <span>.</span><br>
+        <span>.</span><br>
+        <span>.</span>
+    </div> 
+    <div class="menu-wrapper">
+        <h2>Menu</h2>
+            <ul>
+                <li><a href="{% url 'dummy_data' %}">Dummy Data</a></li>
+                <li><a href="{% url 'show_votes' %}">Show Votes Count</a></li>
+                <li><a href="{% url 'mine_blocks' %}">Mine Blocks</a></li>
+                <li><a href="{% url 'block_chain' %}">Block Chain</a></li>
+                <li><a href="{% url 'admin:index' %}">Admin</a></li>
+            </ul>
+    </div>
+    <button class="back-button" onclick="goBack()">← Back</button>
+</div>
+        <div class="main">
+            <h1>Indian Election using Blockchain</h1>
+            <p>Please enter your Aadhaar Card Number to authenticate yourself in order to cast your priceless vote.</p>
+            <form method="POST" action="{% url 'authenticate_voter' %}">
+                {% csrf_token %}
+                <input type="text" name="aadhaar_number" placeholder="XXXX XXXX XXXX" required>
+                <br>
+                <button type="submit">Authenticate</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showDashboard() {
+            document.getElementById("page1").style.display = "none";
+            document.getElementById("page2").style.display = "flex";
+        }
+
+        function goBack() {
+            document.getElementById("page2").style.display = "none";
+            document.getElementById("page1").style.display = "flex";
+        }
+    </script>
+</body>
+</html>

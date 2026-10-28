@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Cast Your Vote</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: url("{% static 'images/parliament_bg.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 40px;
+            color: #333;
+        }
+        body::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("{% static 'images/backgroung.jpg' %}") no-repeat center center;
+        background-size: 100%;   /* smaller than full screen */
+        background-repeat: no-repeat;
+    
+        z-index: -1;
+        }
+
+
+        /* Hide browser navigation elements */
+        html {
+            overflow: hidden;
+        }
+
+        /* Prevent scroll bars and navigation */
+        body {
+            overflow: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Hide any remaining browser UI */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Additional fullscreen styles */
+        :-webkit-full-screen {
+            background: black;
+        }
+
+        :-moz-full-screen {
+            background: black;
+        }
+
+        :fullscreen {
+            background: black;
+        }
+        h2 {
+            text-align: center;
+            font-size: 32px;
+            color: #fff;
+            text-shadow: 1px 1px 3px #000;
+            margin-bottom: 30px;
+        }
+        .ballot-box {
+            max-width: 600px;
+            margin: auto;
+            background-color: rgba(255, 255, 255, 0.35);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+        .party-option {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 15px;
+            border-bottom: 1px solid #ccc;
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+        .party-option:hover {
+            transform: scale(1.05);
+            background-color: #e0f7fa;
+            box-shadow: 0 0 12px rgba(0, 150, 136, 0.6);
+            border: 2px solid #00bfa5;
+        }
+        .party-option img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+        .party-option label {
+            font-size: 18px;
+            font-weight: 500;
+        }
+         .confirmation-box {
+            max-width: 600px;
+            margin: 30px auto 0;
+            background-color: rgba(255, 255, 255, 0.55);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            text-align: center;
+            display: none;
+        }
+        .confirmation-box img {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 10px;
+        }
+        .vote-button {
+            background-color: green;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+    </style>
+</head>
+<body>
+    <h2>🗳️ Cast Your Vote</h2>
+
+    <form method="POST" action="{% url 'confirm_vote' %}" id="vote-form">
+        {% csrf_token %}
+        <input type="hidden" name="party" id="selected-party">
+
+            <div class="ballot-box">
+        {% for party in parties %}
+        <div class="party-option" onclick="showConfirmation('{{ party.party_id }}', '{{ party.name }}', '{{ party.logo.url }}')">
+            <img src="{{ party.logo.url }}" alt="{{ party.name }} logo">
+            <label>{{ party.name }}</label>
+        </div>
+        {% endfor %}
+    </div>
+
+        <div class="confirmation-box" id="confirmation-box">
+            <h3>Confirm your selection</h3>
+            <img id="confirm-logo" src="" alt="Selected Party Logo">
+            <div id="confirm-name" style="font-size: 20px; font-weight: bold;"></div>
+            <button type="submit" class="vote-button">Vote Now</button>
+        </div>
+    </form>
+
+    <script>
+    // Navigation lock mechanism to prevent back button usage
+    (function() {
+      // Push initial state to prevent back navigation
+      history.pushState(null, null, location.href);
+
+      // Listen for popstate events (back/forward button clicks)
+      window.addEventListener('popstate', function(event) {
+        // Push state again to prevent navigation
+        history.pushState(null, null, location.href);
+
+        // Show a message to the user
+        alert('Back navigation is disabled to preserve vote integrity. Please continue with the voting process.');
+      });
+
+      // Prevent using browser shortcuts or right-click back
+      document.addEventListener('keydown', function(event) {
+        // Prevent Alt+Left Arrow (back)
+        if (event.altKey && event.key === 'ArrowLeft') {
+          event.preventDefault();
+          alert('Back navigation is disabled to preserve vote integrity.');
+        }
+      });
+
+      // Attempt to enter fullscreen to hide browser UI
+      function enterFullscreen() {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+          elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) { // Safari
+          elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) { // IE11
+          elem.msRequestFullscreen();
+        }
+      }
+
+      // Try to enter fullscreen on page load
+      enterFullscreen();
+
+      // Prevent exiting fullscreen
+      document.addEventListener('fullscreenchange', function() {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+          // User exited fullscreen, try to re-enter
+          setTimeout(enterFullscreen, 100);
+        }
+      });
+    })();
+
+    function showConfirmation(partyId, partyName, logoUrl) {
+        document.getElementById('selected-party').value = partyId;
+        document.getElementById('confirm-name').textContent = partyName;
+        document.getElementById('confirm-logo').src = logoUrl;
+        document.getElementById('confirmation-box').style.display = 'block';
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+    </script>
+</body>
+</html>
+

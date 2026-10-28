@@ -1,0 +1,112 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+  .voter-form {
+    display: flex;
+    gap: 40px;
+  }
+  .left-column, .right-column {
+    flex: 1;
+  }
+  #video {
+    width: 100%;
+    border-radius: 10px;
+  }
+  #overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+  }
+  .biometric-box {
+    position: relative;
+    margin-bottom: 20px;
+  }
+</style>
+
+<h1>Add Voter</h1>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <div class="voter-form">
+    
+    <!-- LEFT COLUMN: Voter Info -->
+    <div class="left-column">
+      {{ adminform }}
+    </div>
+
+    <!-- RIGHT COLUMN: Biometric Capture -->
+    <div class="right-column">
+      
+      <!-- FACE CAPTURE -->
+      <div class="biometric-box">
+        <h3>Face Capture</h3>
+        <video id="video" autoplay></video>
+        <canvas id="overlay" width="640" height="480"></canvas>
+        <br>
+        <button type="button" onclick="captureFace()">Capture Face</button>
+        <input type="hidden" name="face_image_data" id="face_image_data">
+        <p id="face-status"></p>
+      </div>
+
+      <!-- FINGERPRINT CAPTURE -->
+      <div class="biometric-box">
+        <h3>Fingerprint Capture</h3>
+        <button type="button" onclick="captureFingerprint()">Capture Fingerprint</button>
+        <input type="hidden" name="fingerprint_data" id="fingerprint_data">
+        <p id="finger-status"></p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Save Buttons -->
+  <div class="submit-row">
+    <input type="submit" value="SAVE" class="default">
+    <input type="submit" name="_addanother" value="Save and add another">
+    <input type="submit" name="_continue" value="Save and continue editing">
+  </div>
+</form>
+
+<!-- Scripts -->
+<script>
+  // Start webcam
+  const video = document.getElementById('video');
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(stream => video.srcObject = stream);
+
+  // Capture face
+  function captureFace() {
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    const dataURL = canvas.toDataURL('image/png');
+    document.getElementById('face_image_data').value = dataURL;
+    document.getElementById('face-status').innerText = "Face captured ✅";
+  }
+
+  // Capture fingerprint
+  function captureFingerprint() {
+    const pidOptions = `
+      <PidOptions ver="1.0">
+        <Opts env="P" fCount="1" fType="0" format="0" pidVer="2.0" timeout="10000" wadh="" />
+      </PidOptions>
+    `;
+    fetch('http://127.0.0.1:11100/rd/capture', {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/xml' },
+      body: pidOptions
+    })
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById('fingerprint_data').value = data;
+      document.getElementById('finger-status').innerText = "Fingerprint captured ✅";
+    })
+    .catch(err => {
+      document.getElementById('finger-status').innerText = "Fingerprint capture failed ❌";
+    });
+  }
+</script>
+{% endblock %}

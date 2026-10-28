@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import warnings
+warnings.filterwarnings("ignore", category=RuntimeWarning)
 """Django's command-line utility for administrative tasks."""
 import os
 import sys

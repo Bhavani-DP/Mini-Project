@@ -1,0 +1,84 @@
+{% extends 'election/base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<h2>Add New Voter</h2>
+<form method="post" enctype="multipart/form-data" id="voter-form">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <!-- Biometric Registration Section -->
+    <h3>Biometric Registration</h3>
+
+    <!-- Face Capture -->
+    <div class="biometric-section">
+        <h4>Face Registration</h4>
+        <div style="text-align: center;">
+            <img id="captured-face" width="320" height="240" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==" alt="Captured Face">
+            <br>
+            <button type="button" id="photo-btn">Capture</button>
+        </div>
+        <input type="hidden" name="face_image_data" id="face_image_data">
+        <video id="video" width="320" height="240" style="display:none;" autoplay></video>
+        <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
+    </div>
+
+    <button type="submit" id="save-btn" disabled>Save Voter</button>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const capturedFace = document.getElementById('captured-face');
+    const faceImageData = document.getElementById('face_image_data');
+
+    let stream;
+
+    // Disable save button initially
+    const saveBtn = document.getElementById('save-btn');
+    saveBtn.disabled = true;
+
+    // Photo button to start face capture
+    document.getElementById('photo-btn').addEventListener('click', function() {
+        // Access webcam and show video
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(s => {
+                stream = s;
+                video.srcObject = stream;
+                video.style.display = 'block';
+                capturedFace.style.display = 'none';
+                // Change button to capture
+                this.textContent = 'Take Photo';
+                this.id = 'capture-face';
+            })
+            .catch(err => {
+                console.error('Error accessing webcam:', err);
+            });
+    });
+
+    // Capture face
+    document.addEventListener('click', function(e) {
+        if (e.target.id === 'capture-face') {
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, 320, 240);
+            const dataURL = canvas.toDataURL('image/png');
+            capturedFace.src = dataURL;
+            capturedFace.style.display = 'block';
+            video.style.display = 'none';
+            faceImageData.value = dataURL;
+            // Stop stream
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            // Reset button
+            e.target.textContent = 'Capture';
+            e.target.id = 'photo-btn';
+            // Activate save button
+            saveBtn.disabled = false;
+        }
+    });
+});
+</script>
+{% endblock %}

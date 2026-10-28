@@ -1,0 +1,211 @@
+{% extends 'election/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background: url("{% static 'images/parliament_bg.jpg' %}") no-repeat center center fixed;
+        background-size: cover;
+        margin: 0;
+        padding: 40px;
+        color: #333;
+    }
+
+    /* Hide browser navigation elements */
+    html {
+        overflow: hidden;
+    }
+
+    /* Prevent scroll bars and navigation */
+    body {
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Hide any remaining browser UI */
+    ::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Additional fullscreen styles */
+    :-webkit-full-screen {
+        background: black;
+    }
+
+    :-moz-full-screen {
+        background: black;
+    }
+
+    :fullscreen {
+        background: black;
+    }
+    .message-container {
+        max-width: 600px;
+        margin: 40px auto;
+        background: rgba(255,255,255,0.98);
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .message-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 8px;
+        background: linear-gradient(90deg, #f39c12, #e74c3c);
+    }
+    .warning-icon {
+        font-size: 80px;
+        color: #f39c12;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(243, 156, 18, 0.3);
+    }
+    h1 {
+        color: #e74c3c;
+        font-size: 36px;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+    .subtitle {
+        color: #666;
+        font-size: 18px;
+        margin-bottom: 30px;
+        font-weight: 300;
+    }
+    .info-section {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 25px;
+        margin: 20px 0;
+        border-left: 4px solid #f39c12;
+        text-align: left;
+    }
+    .info-label {
+        font-weight: 600;
+        color: #333;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+    }
+    .info-value {
+        font-family: 'Courier New', monospace;
+        background: #fff;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid #e9ecef;
+        word-break: break-all;
+        font-size: 14px;
+        color: #495057;
+        margin-bottom: 15px;
+    }
+    .security-notice {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 30px;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+    .security-notice h4 {
+        margin-top: 0;
+        color: #fff;
+    }
+    .back-button {
+        display: inline-block;
+        margin-top: 30px;
+        padding: 12px 30px;
+        background: #f39c12;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: background 0.3s ease;
+    }
+    .back-button:hover {
+        background: #e67e22;
+        color: white;
+        text-decoration: none;
+    }
+</style>
+
+<div class="message-container">
+    <div class="warning-icon">⚠️</div>
+    <h1>Already Voted</h1>
+    <p class="subtitle">{{ message }}</p>
+
+    <div class="info-section">
+        <div class="info-label">Voter Name</div>
+        <div class="info-value">{{ voter.name }}</div>
+
+        <div class="info-label">Aadhaar Number</div>
+        <div class="info-value">{{ voter.aadhar_number }}</div>
+
+        <div class="info-label">Email</div>
+        <div class="info-value">{{ voter.email }}</div>
+    </div>
+
+    <div class="security-notice">
+        <h4>🛡️ Election Security</h4>
+        <p>Each registered voter can cast only one vote per election. This ensures the integrity and fairness of the democratic process. If you believe this is an error, please contact election authorities.</p>
+    </div>
+
+</div>
+
+<script>
+// Navigation lock mechanism to prevent back button usage
+(function() {
+  // Push initial state to prevent back navigation
+  history.pushState(null, null, location.href);
+
+  // Listen for popstate events (back/forward button clicks)
+  window.addEventListener('popstate', function(event) {
+    // Push state again to prevent navigation
+    history.pushState(null, null, location.href);
+
+    // Show a message to the user
+    alert('Navigation is disabled. Your vote has been recorded.');
+  });
+
+  // Prevent using browser shortcuts or right-click back
+  document.addEventListener('keydown', function(event) {
+    // Prevent Alt+Left Arrow (back)
+    if (event.altKey && event.key === 'ArrowLeft') {
+      event.preventDefault();
+      alert('Navigation is disabled. Your vote has been recorded.');
+    }
+  });
+
+  // Attempt to enter fullscreen to hide browser UI
+  function enterFullscreen() {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) { // Safari
+      elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { // IE11
+      elem.msRequestFullscreen();
+    }
+  }
+
+  // Try to enter fullscreen on page load
+  enterFullscreen();
+
+  // Prevent exiting fullscreen
+  document.addEventListener('fullscreenchange', function() {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+      // User exited fullscreen, try to re-enter
+      setTimeout(enterFullscreen, 100);
+    }
+  });
+})();
+</script>
+
+{% endblock %}

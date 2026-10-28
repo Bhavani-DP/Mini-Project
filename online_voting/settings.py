@@ -15,6 +15,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
     'election',
     'blockchain',
     'accounts',
@@ -41,7 +42,7 @@ WSGI_APPLICATION = 'online_voting.wsgi.application'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'election', 'templates')],  # ✅ Add this line
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -53,6 +54,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 # 🔹 Database
 DATABASES = {
@@ -82,12 +84,25 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'kruthi84069110@gmail.com'
-EMAIL_HOST_PASSWORD = 'gtti nqsd bnvq rtdv'
+EMAIL_HOST_USER = 'bhavanidp66@gmail.com'
+EMAIL_HOST_PASSWORD = 'fbal wnbn qeym hbwl'
 
 TWILIO_ACCOUNT_SID = 'AC7bae80ba2d7ec137e84e71123be96eef'
 TWILIO_AUTH_TOKEN = 'a18a47253718e82de72c6ddb4ab5fcbf'

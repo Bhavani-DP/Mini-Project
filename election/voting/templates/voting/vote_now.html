@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Verify Voter</title>
+</head>
+<body>
+  <h2>Verify Face for {{ voter.name }}</h2>
+  <video id="video" autoplay playsinline style="width: 420px;"></video>
+  <canvas id="canvas" style="display:none;"></canvas>
+  <div style="margin-top:10px;">
+    <button id="verify">Verify Face</button>
+  </div>
+  <pre id="result" style="margin-top:10px; background:#f7f7f7; padding:10px;"></pre>
+
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const result = document.getElementById('result');
+
+    async function initCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        video.srcObject = stream;
+      } catch (err) {
+        alert('Camera access failed: ' + err);
+      }
+    }
+
+    document.getElementById('verify').addEventListener('click', async () => {
+      const w = video.videoWidth, h = video.videoHeight;
+      if (!w || !h) { alert('Camera not ready yet.'); return; }
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL('image/png');
+
+      const resp = await fetch("{% url 'verify_face' voter.id %}", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ live_face: dataUrl })
+      });
+      const data = await resp.json();
+      result.textContent = JSON.stringify(data, null, 2);
+    });
+
+    initCamera();
+  </script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<h2>Welcome {{ voter.name }}</h2>
+<p>Your registered face:</p>
+<img src="{{ voter.profile_pic.url }}" style="width:150px; border-radius:8px;" />
+
+<!-- Live Face Verification -->
+<div style="margin-top:20px;">
+  <h3>Verify Your Face</h3>
+  <video id="video" autoplay style="width:200px; border:2px solid #333; border-radius:4px;"></video><br>
+  <button type="button" onclick="verifyFace()" style="margin-top:10px;">Verify Face</button>
+  <canvas id="canvas" style="display:none;"></canvas>
+  <div id="live-preview" style="margin-top:10px;"></div>
+</div>
+
+<!-- Fingerprint Verification -->
+<div style="margin-top:30px;">
+  <h3>Or Use Fingerprint</h3>
+  <button type="button" onclick="verifyFingerprint()" style="background-color:green; color:white; padding:10px;">Use Fingerprint / Face ID</button>
+  <p id="fingerprint-status">Waiting for fingerprint...</p>
+</div>
+
+<script>
+  // Start webcam
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(stream => document.getElementById('video').srcObject = stream)
+    .catch(err => console.error("Camera error:", err));
+
+  // Verify face
+  function verifyFace() {
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    const imageData = canvas.toDataURL('image/png');
+
+    document.getElementById('live-preview').innerHTML =
+      `<img src="${imageData}" style="width:120px; border-radius:6px;" />`;
+
+    fetch("/verify-face/{{ voter.id }}/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ live_face: imageData })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.verified) {
+        alert("✅ Face verified! You may cast your vote.");
+      } else {
+        alert("❌ Face verification failed. Please try again.");
+      }
+    })
+    .catch(err => console.error("Verification error:", err));
+  }
+
+</script>

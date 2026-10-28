@@ -1,0 +1,31 @@
+{% extends 'election/base.html' %}
+
+{% block title %}Vote Count{% endblock %}
+
+{% block content %}
+<div style="text-align: center; margin: 50px;">
+    <h1 style="font-size: 4em;">Vote Count</h1>
+    <table style="margin: 0 auto; border-collapse: collapse; border: 2px solid rgba(0, 0, 0, 0.8); width: 80%;">
+        <thead>
+            <tr style="background-color: rgba(255, 255, 255, 0.2);">
+                <th style="border: 4px solid rgba(0, 0, 0, 0.8); padding: 15px; font-size: 2.6em;">Sr. No.</th>
+                <th style="border: 4px solid rgba(0, 0, 0, 0.8); padding: 15px; font-size: 2.6em;">Party Symbol</th>
+                <th style="border: 4px solid rgba(0, 0, 0, 0.8); padding: 15px; font-size: 2.6em;">Party Name</th>
+                <th style="border: 4px solid rgba(0, 0, 0, 0.8); padding: 15px; font-size: 2.6em;">Vote Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for party in parties %}
+            <tr class="{% cycle 'even' 'odd' %}" style="background-color: transparent;">
+                <td style="border: 4px solid rgba(0, 0, 0, 0.8); padding: 15px; font-size: 2.6em;">{{ forloop.counter }}</td>
+                <td style="border: 4px solid rgba(0, 0, 0, 0.8); padding: 15px; font-size: 2.6em;">
+                    <img src="{{ party.logo.url }}" alt="{{ party.name }} Symbol" style="width: 80px; height: 80px;">
+                </td>
+                <td style="border: 4px solid rgba(0, 0, 0, 0.8); padding: 15px; font-size: 2.6em;">{{ party.name }}</td>
+                <td style="border: 4px solid rgba(0, 0, 0, 0.8); padding: 15px; font-size: 2.6em;">{{ party.vote_count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -3,8 +3,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sending OTP</title>
-  <meta http-equiv="refresh" content="3;url={% url 'verify_aadhaar' %}">
+  <title>Verifying OTP</title>
+  <!-- After 5 seconds, redirect to voter_details -->
+  <meta http-equiv="refresh" content="5;url={% url 'voter_details' %}">
   <style>
     html, body {
       margin: 0;
@@ -79,7 +80,8 @@
       <div class="title">INDIAN ELECTION</div>
       <div class="subtitle">using Blockchain</div>
     </div>
-    <div class="otp-box">Please wait, OTP is being sent to your email-id.</div>
+    <!-- 🔑 Change the message here -->
+    <div class="otp-box">Please wait.......... your OTP is being sent.</div>
     <div class="dots">
       <div class="dot"></div>
       <div class="dot"></div>

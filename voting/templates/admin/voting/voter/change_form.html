@@ -1,0 +1,138 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block extrahead %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+{{ block.super }}
+
+<style>
+.biometric-sidebar {
+    position: fixed;
+    right: 20px;
+    top: 100px;
+    width: 350px;
+    background: #f8f9fa;
+    padding: 20px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.biometric-section {
+    margin-bottom: 20px;
+}
+.biometric-btn {
+    background: #79aec8;
+    color: white;
+    border: 1px solid #79aec8;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    display: inline-block;
+    width: auto;
+    margin-top: 10px;
+}
+.biometric-btn:hover {
+    background: #609ab6;
+    border-color: #609ab6;
+}
+#captured-face {
+    margin-bottom: 10px;
+}
+</style>
+
+<!-- Biometric Registration Section -->
+<div class="biometric-sidebar">
+    <b><h1>Biometric Registration</h1></b>
+
+    <!-- Face Capture -->
+    <div class="biometric-section">
+        <h2>Face Registration</h2>
+        <div style="text-align: center;">
+            <img id="captured-face" width="320" height="240" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==" alt="Captured Face">
+            <br>
+            <button type="button" id="photo-btn" class="biometric-btn">Photo</button>
+        </div>
+        <input type="hidden" name="face_image_data" id="face_image_data">
+        <video id="video" width="320" height="240" style="display:none;" autoplay></video>
+        <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
+    </div>
+
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const capturedFace = document.getElementById('captured-face');
+    const faceImageData = document.getElementById('face_image_data');
+
+    let stream;
+
+    // Disable save button initially
+    const saveBtn = document.querySelector('input[name="_save"]') || document.querySelector('input[type="submit"]');
+    if (saveBtn) {
+        saveBtn.disabled = true;
+    }
+
+    // Photo button to start face capture
+    document.getElementById('photo-btn').addEventListener('click', function() {
+        // Access webcam and show video
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(s => {
+                stream = s;
+                video.srcObject = stream;
+                video.style.display = 'block';
+                capturedFace.style.display = 'none';
+                // Change button to capture
+                this.textContent = 'Capture';
+                this.id = 'capture-face';
+            })
+            .catch(err => {
+                console.error('Error accessing webcam:', err);
+            });
+    });
+
+    // Capture face
+    document.addEventListener('click', function(e) {
+        if (e.target.id === 'capture-face') {
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, 320, 240);
+            const dataURL = canvas.toDataURL('image/png');
+            capturedFace.src = dataURL;
+            capturedFace.style.display = 'block';
+            video.style.display = 'none';
+            faceImageData.value = dataURL;
+            // Stop stream
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            // Reset button
+            e.target.textContent = 'Photo';
+            e.target.id = 'photo-btn';
+            checkBiometrics();
+        }
+    });
+
+    // Function to check if face is captured
+    function checkBiometrics() {
+        const faceData = document.getElementById('face_image_data').value;
+        const saveBtn = document.querySelector('input[name="_save"]') || document.querySelector('input[type="submit"]');
+
+        if (saveBtn) {
+            if (faceData) {
+                saveBtn.disabled = false;
+            } else {
+                saveBtn.disabled = true;
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

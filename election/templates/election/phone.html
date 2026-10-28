@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Change Email</title>
+  <style>
+    body {
+      background-color: #f0f0f0;
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 300px;
+      text-align: center;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    input[type="Phone Number"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background-color: blue;
+      color: blue;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      width: 100%;
+      cursor: pointer;
+      
+}
+    </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Change Phone Number</h2>
+    {% if messages %}
+      {% for message in messages %}
+        <div class="error">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <input type="Phone Number" name="Phone Number" placeholder="Enter your phone Number" value="{{ associated_Phone_Number }}">
+      <a href="{% url 'change_phone_page' %}">
+  <button class="change-btn">Change Phone</button>
+</a>
+    </form>
+  </div>
+</body>
+</html>

@@ -1,0 +1,283 @@
+
+{% load static %}
+{% block content %}
+it
+<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
+<style>
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background: url("{% static 'images/parliament_bg.jpg' %}") no-repeat center center fixed;
+        background-size: cover;
+        margin: 0;
+        padding: 40px;
+        color: #333;
+    }
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url("{% static 'images/backgroung.jpg' %}") no-repeat center center;
+      background-size: 100%;   /* smaller than full screen */
+      background-repeat: no-repeat;
+      z-index: -1;
+    }
+
+
+    /* Hide browser navigation elements */
+    html {
+        overflow: hidden;
+    }
+
+    /* Prevent scroll bars and navigation */
+    body {
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Hide any remaining browser UI */
+    ::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Additional fullscreen styles */
+    :-webkit-full-screen {
+        background: black;
+    }
+
+    :-moz-full-screen {
+        background: black;
+    }
+
+    :fullscreen {
+        background: black;
+    }
+    h2 {
+        text-align: center;
+        font-size: 32px;
+        color: #fff;
+        text-shadow: 1px 1px 3px #000;
+        margin-bottom: 30px;
+    }
+    .confirmation-box {
+        max-width: 520px;
+        margin: 24px auto;
+        background: rgba(255,255,255,0);
+        padding: 24px;
+        border-radius: 10px;
+        box-shadow: 0 0 12px rgba(0,0,0,0.18);
+        text-align: center;
+    }
+    .stored-face {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 4px solid #27ae60;
+        margin: 20px auto;
+        display: block;
+    }
+    .party-name {
+        font-size: 20px;
+        font-weight: 600;
+        margin-top: 10px;
+    }
+    .vote-button {
+        display: block;
+        margin: 20px auto;
+        padding: 12px 30px;
+        font-size: 18px;
+        background-color: #27ae60;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+    #video {
+        width: 300px;
+        height: 225px;
+        border-radius: 50%;
+        border: 4px solid #ccc;
+        margin-top: 20px;
+        position: relative;
+        object-fit: cover;
+        transition: border-color 0.3s ease;
+    }
+    #video.face-detected {
+        border-color: #27ae60;
+        box-shadow: 0 0 20px rgba(39, 174, 96, 0.5);
+        animation: scanBorder 2s linear infinite;
+    }
+    @keyframes scanBorder {
+        0% { background: linear-gradient(90deg, #27ae60 0%, transparent 50%, transparent 100%); }
+        50% { background: linear-gradient(90deg, transparent 0%, #27ae60 50%, transparent 100%); }
+        100% { background: linear-gradient(90deg, transparent 0%, transparent 50%, #27ae60 100%); }
+    }
+    #face-result {
+        margin-top: 10px;
+        font-weight: bold;
+        font-size: 16px;
+        color: #333;
+    }
+</style>
+<h2>🗳️ Confirm Your Vote</h2>
+
+<div class="confirmation-box">
+    <img src="{{ selected_party.logo.url }}" alt="{{ selected_party.name }} logo" style="height:64px">
+    <div class="party-name">{{ selected_party.name }}</div>
+
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <div id="face-result">Position your face in the camera to begin verification.</div>
+
+    <form id="final-vote" method="POST" action="{% url 'vote_success' %}" style="margin-top:16px;">
+        {% csrf_token %}
+        <input type="hidden" name="party_id" value="{{ selected_party.party_id }}">
+    </form>
+</div>
+
+<script>
+// Navigation lock mechanism to prevent back button usage
+(function() {
+  // Push initial state to prevent back navigation
+  history.pushState(null, null, location.href);
+
+  // Listen for popstate events (back/forward button clicks)
+  window.addEventListener('popstate', function(event) {
+    // Push state again to prevent navigation
+    history.pushState(null, null, location.href);
+
+    // Show a message to the user
+    alert('Back navigation is disabled to preserve vote integrity. Please continue with the voting process.');
+  });
+
+  // Prevent using browser shortcuts or right-click back
+  document.addEventListener('keydown', function(event) {
+    // Prevent Alt+Left Arrow (back)
+    if (event.altKey && event.key === 'ArrowLeft') {
+      event.preventDefault();
+      alert('Back navigation is disabled to preserve vote integrity.');
+    }
+  });
+
+  // Attempt to enter fullscreen to hide browser UI
+  function enterFullscreen() {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) { // Safari
+      elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { // IE11
+      elem.msRequestFullscreen();
+    }
+  }
+
+  // Try to enter fullscreen on page load
+  enterFullscreen();
+
+  // Prevent exiting fullscreen
+  document.addEventListener('fullscreenchange', function() {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+      // User exited fullscreen, try to re-enter
+      setTimeout(enterFullscreen, 100);
+    }
+  });
+})();
+
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const resultBox = document.getElementById('face-result');
+const finalForm = document.getElementById('final-vote');
+
+let faceDetected = false;
+let blinkState = 'open'; // 'open', 'closed', 'blinking'
+let blinkCooldown = false;
+
+const EAR_THRESHOLD = 0.2;
+const BLINK_TIME_WINDOW = 800; // ms
+let blinkStartTime = 0;
+
+function eyeAspectRatio(eye) {
+  const A = faceapi.euclideanDistance(eye[1], eye[5]);
+  const B = faceapi.euclideanDistance(eye[2], eye[4]);
+  const C = faceapi.euclideanDistance(eye[0], eye[3]);
+  return (A + B) / (2.0 * C);
+}
+
+async function initCamera() {
+  await Promise.all([
+    faceapi.nets.tinyFaceDetector.loadFromUri('/static/weights/face-api.js-master/weights/'),
+    faceapi.nets.faceLandmark68Net.loadFromUri('/static/weights/face-api.js-master/weights/')
+  ]);
+  const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+  video.srcObject = stream;
+  detectFace();
+}
+
+async function detectFace() {
+  if (!video.videoWidth) {
+    requestAnimationFrame(detectFace);
+    return;
+  }
+
+  const detections = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
+  if (detections) {
+    if (!faceDetected) {
+      faceDetected = true;
+      video.classList.add('face-detected');
+      resultBox.textContent = "👤 Face detected! Verifying identity...";
+      // Trigger verification immediately when face is detected
+      setTimeout(performVerification, 1000); // Wait 1 second for stable detection
+    }
+  } else {
+    faceDetected = false;
+    video.classList.remove('face-detected');
+    resultBox.textContent = "Position your face in the camera.";
+  }
+  requestAnimationFrame(detectFace);
+}
+
+async function performVerification() {
+  resultBox.textContent = "🔍 Verifying your identity...";
+  const ctx = canvas.getContext('2d');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  ctx.drawImage(video, 0, 0);
+  const dataUrl = canvas.toDataURL('image/png');
+
+  console.log("Sending verification request...");
+  try {
+    const resp = await fetch(`/verify-face/{{ voter.id }}/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}"
+      },
+      body: JSON.stringify({ live_face: dataUrl })
+    });
+
+    console.log("Response status:", resp.status);
+    const data = await resp.json();
+    console.log("Response data:", data);
+
+    if (data.verified) {
+      resultBox.textContent = "✅ Identity verified! Casting your vote…";
+      console.log("Verification successful, submitting form...");
+      setTimeout(() => finalForm.submit(), 2000);
+    } else {
+      resultBox.textContent = "❌ " + (data.error || "Verification failed.");
+      console.log("Verification failed:", data.error);
+      faceDetected = false;
+    }
+  } catch (error) {
+    console.error("Verification error:", error);
+    resultBox.textContent = "❌ Network error during verification.";
+    faceDetected = false;
+  }
+}
+
+initCamera();
+</script>
+{% endblock %}

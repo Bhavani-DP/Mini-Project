@@ -7,173 +7,380 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
       margin: 0;
       padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       height: 100vh;
+      overflow: hidden;
+      position: relative;
     }
 
+    /* Background image */
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url("{% static 'images\image.png' %}") no-repeat center center;
+      background-size: 100%;
+      background-repeat: no-repeat;
+      opacity:50%;
+      z-index: -1;
+    }
+
+    /* Hide browser navigation elements */
+    html {
+        overflow: hidden;
+    }
+
+    /* Prevent scroll bars and navigation */
+    body {
+        overflow: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Hide any remaining browser UI */
+    ::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Additional fullscreen styles */
+    :-webkit-full-screen {
+        background: black;
+    }
+
+    :-moz-full-screen {
+        background: black;
+    }
+
+    :fullscreen {
+        background: black;
+    }
     .container {
-      background-color: white;
+      background-color: rgba(255, 255, 255, 0.7);
       padding: 30px 40px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
       width: 600px;
+      margin: 80px auto;
+      position: relative;
+      z-index: 1;
     }
+    h2 { text-align: center; margin-bottom: 25px; color: #333; }
+    .info-box { border: 2px solid #444; border-radius: 8px; padding: 20px; display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 15px; }
+    td { padding: 8px 5px; font-size: 16px; border-bottom: 2px solid #444; }
+    td.label { font-weight: bold; width: 40%; color: #555; }
+    table tr:last-child td { border-bottom: none; }
+    .profile-pic { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc; margin-top: 20px; }
+    .email-row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+    .email-label { font-weight: bold; color: #555; margin-right: 10px; }
+    .email-value { flex-grow: 1; font-size: 16px; margin-right: 10px; color: #333; }
+    .email-actions { display: flex; gap: 8px; }
+    button { padding: 6px 12px; font-size: 14px; border: none; border-radius: 5px; cursor: pointer; }
+    .change-btn { background-color: #ff9800; color: white; }
+    .otp-btn { background-color: #4CAF50; color: white; }
+    .note { text-align: center; font-size: 14px; color: #777; margin-top: 20px; }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; backdrop-filter: blur(1.5px); background-color: rgba(255, 255, 255, 0.4); z-index: 999; display: none; }
+    .modal-box { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px 40px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.3); width: 400px; text-align: center; z-index: 1000; display: none; }
+    .otp-input-group { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+    .otp-input-group input { width: 45px; height: 55px; font-size: 24px; text-align: center; border: 1px solid #ccc; border-radius: 8px; font-family: monospace; box-shadow: 0 0 3px rgba(0,0,0,0.1); }
+    .verify-btn { background-color: #007bff; color: white; font-size: 16px; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+    .resend-text { margin-top: 15px; font-size: 14px; color: #555; }
+    .resend-text a { color: #007bff; text-decoration: underline; }
+    .show-modal .modal-overlay, .show-modal .modal-box { display: block; }
 
-    h2 {
-      text-align: center;
-      margin-bottom: 25px;
-      color: #333;
-    }
-
-    .info-box {
+    /* Inline email box */
+    #emailBox {
+      display: none;
+      margin-top: 15px;
+      padding: 15px;
       border: 1px solid #ccc;
       border-radius: 8px;
-      padding: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 20px;
+      background: #fafafa;
     }
-
-    table {
-      border-collapse: collapse;
+    #emailBox input[type="email"] {
       width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
     }
-
-    td {
-      padding: 8px 5px;
-      font-size: 16px;
-      border-bottom: 1px solid #ddd;
-    }
-
-    td.label {
-      font-weight: bold;
-      width: 40%;
-      color: #555;
-    }
-
-    /* Remove bottom border from last row */
-    table tr:last-child td {
-      border-bottom: none;
-    }
-
-    .profile-pic {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid #ccc;
-      margin-top: 20px;
-    }
-
-    .email-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 10px;
-    }
-
-    .email-label {
-      font-weight: bold;
-      color: #555;
-      margin-right: 10px;
-    }
-
-    .email-value {
-      flex-grow: 1;
-      font-size: 16px;
-      margin-right: 10px;
-      color: #333;
-    }
-
-    .email-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    button {
-      padding: 6px 12px;
-      font-size: 14px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .change-btn {
-      background-color: #ff9800;
+    #emailBox button {
+      background-color: #007bff;
       color: white;
-    }
-
-    .otp-btn {
-      background-color: #4CAF50;
-      color: white;
-    }
-
-    .note {
-      text-align: center;
-      font-size: 14px;
-      color: #777;
-      margin-top: 20px;
+      width: 100%;
     }
   </style>
 </head>
-<body>
+
+<body {% if otp_sent and not otp_verified %}class="show-modal"{% endif %}>
   <div class="container">
     <h2>Authentication Successful</h2>
-
     <div class="info-box">
       <table>
-        <tr>
-          <td class="label">Aadhaar No.:</td>
-          <td>{{ voter.aadhar_number }}</td>
-        </tr>
-        <tr>
-          <td class="label">Name:</td>
-          <td>{{ voter.name }}</td>
-        </tr>
-        <tr>
-          <td class="label">DOB:</td>
-          <td>{{ voter.dob }}</td>
-        </tr>
-        <tr>
-          <td class="label">Pincode No.:</td>
-          <td>{{ voter.pincode }}</td>
-        </tr>
-        <tr>
-          <td class="label">Region:</td>
-          <td>{{ voter.region }}</td>
-        </tr>
+        <tr><td class="label">Aadhaar No.:</td><td>{{ voter.aadhar_number }}</td></tr>
+        <tr><td class="label">Name:</td><td>{{ voter.name }}</td></tr>
+        <tr><td class="label">DOB:</td><td>{{ voter.dob }}</td></tr>
+        <tr><td class="label">Pincode No.:</td><td>{{ voter.pincode }}</td></tr>
+        <tr><td class="label">Region:</td><td>{{ voter.region }}</td></tr>
       </table>
-      {% if voter.profile_pic %}
-        <img src="{{ voter.profile_pic.url }}" alt="Profile Picture" class="profile-pic">
+      {% if voter.face_image %}
+        <img src="{{ voter.face_image.url }}" alt="Profile Picture" class="profile-pic">
       {% else %}
-         <img src="{% static 'images/default_avatar.png' %}" alt="Default Avatar" class="profile-pic">
+        <img src="{% static 'images/default_avatar.png' %}" alt="Default Avatar" class="profile-pic">
       {% endif %}
     </div>
-
+    <!-- Combined Phone and Email row -->
     <div class="email-row">
-      <span class="email-label">Associated Email-ID:</span>
-      <span class="email-value">{{ voter.email }}</span>
+      <span class="email-label">Associated Phone Number & Email-ID:</span>
+      <span class="email-value" id="currentContact">{{ voter.phone_number }} & {{ voter.email }}</span>
       <div class="email-actions">
-        <form method="GET" action="{% url 'change_email' %}">
-          <button class="change-btn" type="submit">Change</button>
-        </form>
-
-        <form method="POST" action="{% url 'send_otp' %}">
-          {% csrf_token %}
-          <input type="hidden" name="email" value="{{ voter.email }}">
-          <input type="hidden" name="phone_number" value="{{ voter.phone_number }}">
-          <button class="otp-btn" type="submit">Send OTP</button>
-        </form>
+        <button class="change-btn" type="button" onclick="toggleChangeBoxes()">Change</button>
+        <button class="otp-btn" type="button" onclick="sendOTP()" id="sendOtpBtn">Send OTP</button>
       </div>
     </div>
 
-    <div class="note">Please verify your Email-ID. Key will be sent to this Email-ID.</div>
+    <!-- Combined change box for phone and email -->
+    <div id="changeBox" style="display:none; margin-top:15px; padding:15px; border:1px solid #ccc; border-radius:8px; background:#fafafa;">
+      <form id="changeForm">
+        {% csrf_token %}
+        <label for="phoneInput">Phone Number:</label>
+        <input type="tel" name="phone_number" id="phoneInput" placeholder="Enter new phone number" value="{{ voter.phone_number }}" required style="width:100%; padding:8px; margin-bottom:10px; border:1px solid #ccc; border-radius:4px;">
+        <label for="emailInput">Email:</label>
+        <input type="email" name="email" id="emailInput" placeholder="Enter new email" value="{{ voter.email }}" required style="width:100%; padding:8px; margin-bottom:10px; border:1px solid #ccc; border-radius:4px;">
+        <button type="submit">Update</button>
+      </form>
+      <div id="changeMessage" style="margin-top:10px; font-size:14px; color:green;"></div>
+    </div>
+
+    {% if otp_verified %}
+      <div style="text-align:center; margin-top:20px;">
+        <form method="GET" action="{% url 'cast_vote' %}">
+          <button type="submit" class="verify-btn" style="background-color:#28a745;">Vote Now</button>
+        </form>
+      </div>
+    {% endif %}
   </div>
+
+  <!-- OTP Modal -->
+  <div class="modal-overlay"></div>
+  <div class="modal-box">
+    <h2 style="font-size:24px; margin-bottom:10px;">Verify OTP</h2>
+    <p class="subtext" style="font-size:16px; margin-bottom:20px;">
+      Enter the 6-digit code sent to {{ voter.phone_number }}
+    </p>
+    <form method="POST" action="{% url 'confirm_otp' %}">
+      {% csrf_token %}
+      <div class="otp-input-group">
+        <input type="text" name="otp1" maxlength="1" required />
+        <input type="text" name="otp2" maxlength="1" required />
+        <input type="text" name="otp3" maxlength="1" required />
+        <input type="text" name="otp4" maxlength="1" required />
+        <input type="text" name="otp5" maxlength="1" required />
+        <input type="text" name="otp6" maxlength="1" required />
+      </div>
+      <button type="submit" class="verify-btn" style="background-color:#007bff; margin-top:10px;">
+        Verify OTP
+      </button>
+    </form>
+
+    <form id="resend-form" method="GET" action="{% url 'send_otp' %}">
+            <input type="hidden" name="resend" value="true">
+    </form>
+
+    <!-- Resend link -->
+    <p class="resend-text" style="margin-top:15px;">
+      Didn't receive code?
+      <a id="resend-link" style="pointer-events: none; color: gray; text-decoration: none;">
+        Resend OTP (in <span id="resend-count">60</span>s)
+      </a>
+    </p>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // Navigation lock mechanism to prevent back button usage
+    (function() {
+      // Push initial state to prevent back navigation
+      history.pushState(null, null, location.href);
+
+      // Listen for popstate events (back/forward button clicks)
+      window.addEventListener('popstate', function(event) {
+        // Push state again to prevent navigation
+        history.pushState(null, null, location.href);
+
+        // Show a message to the user
+        alert('Back navigation is disabled to preserve vote integrity. Please continue with the voting process.');
+      });
+
+      // Prevent using browser shortcuts or right-click back
+      document.addEventListener('keydown', function(event) {
+        // Prevent Alt+Left Arrow (back)
+        if (event.altKey && event.key === 'ArrowLeft') {
+          event.preventDefault();
+          alert('Back navigation is disabled to preserve vote integrity.');
+        }
+      });
+    })();
+
+    // OTP input auto-focus and backspace
+    const inputs = document.querySelectorAll(".otp-input-group input");
+    inputs.forEach((input, index) => {
+      input.addEventListener("input", () => {
+        if (input.value && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+      });
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Backspace" && !input.value && index > 0) {
+          inputs[index - 1].focus();
+        }
+      });
+    });
+
+    // Countdown beside resend link
+    let seconds = 60;
+    const resendCount = document.getElementById("resend-count");
+    const resendLink = document.getElementById("resend-link");
+    const resendForm = document.getElementById("resend-form");
+
+    const resendTimer = setInterval(() => {
+      seconds--;
+      resendCount.textContent = seconds;
+      if (seconds <= 0) {
+        clearInterval(resendTimer);
+        resendLink.textContent = "Resend OTP";
+        resendLink.style.color = "#007bff";
+        resendLink.style.textDecoration = "underline";
+        resendLink.style.pointerEvents = "auto";
+
+        resendLink.addEventListener("click", (e) => {
+          e.preventDefault();
+          resendForm.submit(); // triggers resend
+        });
+      }
+    }, 1000);
+
+    // Toggle inline phone box
+    function togglePhoneBox() {
+      const box = document.getElementById("phoneBox");
+      box.style.display = box.style.display === "none" ? "block" : "none";
+    }
+
+    // Toggle inline email box
+    function toggleEmailBox() {
+      const box = document.getElementById("emailBox");
+      box.style.display = box.style.display === "none" ? "block" : "none";
+    }
+
+    // Toggle the combined change box
+    function toggleChangeBoxes() {
+      const box = document.getElementById("changeBox");
+      box.style.display = box.style.display === "none" ? "block" : "none";
+    }
+
+    // Store updated contact details
+    let updatedPhone = null;
+    let updatedEmail = null;
+
+    // AJAX combined update for phone and email
+    document.getElementById("changeForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const phone = document.getElementById("phoneInput").value;
+      const email = document.getElementById("emailInput").value;
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+      let phoneUpdated = false;
+      let emailUpdated = false;
+
+      // Update phone
+      fetch("{% url 'change_phone' %}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRFToken": csrfToken
+        },
+        body: new URLSearchParams({ phone_number: phone })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          phoneUpdated = true;
+          updatedPhone = phone; // Store updated phone
+          document.querySelector(".email-value").textContent = phone + " & " + email;
+          document.getElementById("changeMessage").textContent = "✅ Updated successfully!";
+        } else {
+          document.getElementById("changeMessage").textContent = "❌ " + (data.error || "Could not update.");
+        }
+      })
+      .catch(() => {
+        document.getElementById("changeMessage").textContent = "❌ Something went wrong. Please try again.";
+      });
+
+      // Update email
+      fetch("{% url 'change_email' %}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRFToken": csrfToken
+        },
+        body: new URLSearchParams({ email: email })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          emailUpdated = true;
+          updatedEmail = email; // Store updated email
+          document.querySelector(".email-value").textContent = phone + " & " + email;
+          document.getElementById("changeMessage").textContent = "✅ Updated successfully!";
+        } else {
+          document.getElementById("changeMessage").textContent = "❌ " + (data.error || "Could not update.");
+        }
+      })
+      .catch(() => {
+        document.getElementById("changeMessage").textContent = "❌ Something went wrong. Please try again.";
+      });
+    });
+
+    // Send OTP function
+    function sendOTP() {
+      // Use updated contact details if available, otherwise use displayed text
+      const phone = updatedPhone || document.getElementById("currentContact").textContent.split(" & ")[0].trim();
+      const email = updatedEmail || document.getElementById("currentContact").textContent.split(" & ")[1].trim();
+
+      // Create a form to submit OTP request
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '{% url "send_otp" %}';
+
+      // Add CSRF token
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+      const csrfInput = document.createElement('input');
+      csrfInput.type = 'hidden';
+      csrfInput.name = 'csrfmiddlewaretoken';
+      csrfInput.value = csrfToken;
+      form.appendChild(csrfInput);
+
+      // Add email and phone
+      const emailInput = document.createElement('input');
+      emailInput.type = 'hidden';
+      emailInput.name = 'email';
+      emailInput.value = email;
+      form.appendChild(emailInput);
+
+      const phoneInput = document.createElement('input');
+      phoneInput.type = 'hidden';
+      phoneInput.name = 'phone_number';
+      phoneInput.value = phone;
+      form.appendChild(phoneInput);
+
+      // Submit the form
+      document.body.appendChild(form);
+      form.submit();
+    }
+  </script>
 </body>
 </html>
