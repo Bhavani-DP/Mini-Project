@@ -97,13 +97,9 @@ LOGGING = {
     },
 }
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'bhavanidp66@gmail.com'
-EMAIL_HOST_PASSWORD = 'fbal wnbn qeym hbwl'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
 
-TWILIO_ACCOUNT_SID = 'AC7bae80ba2d7ec137e84e71123be96eef'
-TWILIO_AUTH_TOKEN = 'a18a47253718e82de72c6ddb4ab5fcbf'
-TWILIO_PHONE_NUMBER = '+12173876498'
+TWILIO_ACCOUNT_SID = ''
+TWILIO_AUTH_TOKEN = ''
+TWILIO_PHONE_NUMBER = ''

@@ -1,0 +1,107 @@
+/* Fixed Sidebar */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  padding: 20px;
+  color: white;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sidebar-dots {
+  text-align: center;
+  font-size: 2em;
+  color: #ffcc00;
+  margin-bottom: 10px;
+  line-height: 1.2;
+}
+
+.menu-wrapper {
+  margin-top: -20px; /* This moves the menu upward */
+}
+
+.sidebar h2 {
+  font-size: 1.5em;
+  margin-bottom: 16px;
+  color: #ffcc00;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar ul li {
+  margin-bottom: 15px;
+}
+
+.sidebar ul li a {
+  color: white;
+  text-decoration: none;
+  font-size: 1.1em;
+}
+
+.sidebar ul li a:hover {
+  color: #ff9933;
+}
+
+.back-button {
+  background-color: #ff9933;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  align-self: flex-start;
+}
+
+.back-button:hover {
+  background-color: #cc7a29;
+}
+
+/* Top Logo with stacked text beside logo */
+.top-logo {
+  position: fixed;
+  top: 20px;
+  left: 220px; /* offset from sidebar */
+  z-index: 1000;
+  cursor: pointer;
+}
+
+.logo-horizontal {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-horizontal img {
+  height: 60px;
+  width: auto;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1.2;
+}
+
+.logo-title {
+  font-size: 1.6em;
+  font-weight: 700;
+  color: white;
+}
+
+.logo-subtitle {
+  font-size: 1em;
+  font-weight: 500;
+  color: #ddd;
+}
